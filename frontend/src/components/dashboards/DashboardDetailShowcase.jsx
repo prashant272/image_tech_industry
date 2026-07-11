@@ -8,8 +8,8 @@ const DashboardDetailShowcase = ({ dashboardId }) => {
     'admin': { 
       title: 'Admin Dashboard', 
       icon: '🏢', 
-      laptopImage: '/images/admin/AdminDashBoard web.png',
-      mobileImage: '/images/admin/AdminDashBoard ph.png',
+      laptopImage: '/images/admin/AdminDashBoard%20web.png',
+      mobileImage: '/images/admin/AdminDashBoard%20ph.png',
       tagline: 'Complete Control at Your Fingertips',
       placeholderText: 'The Admin Dashboard provides full visibility and control over your society. Manage residents, billing, complaints, and security from one centralized command center.',
       features: [
@@ -28,7 +28,7 @@ const DashboardDetailShowcase = ({ dashboardId }) => {
         {
           title: 'Helpdesk & Complaints',
           desc: 'Track and resolve resident complaints efficiently. Assign tickets to maintenance staff, monitor resolution times, and keep residents updated.',
-          webImg: '/images/admin/AdminComplaints web.png',
+          webImg: '/images/admin/AdminComplaints%20web.png',
           phImg: '/images/admin/AdminComplainPh.png'
         },
         {

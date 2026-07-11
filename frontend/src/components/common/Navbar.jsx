@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronRight, ArrowRight, ShieldCheck, Users, MessageSquare, Wallet, Wrench, Building2, LayoutGrid, Home, Building } from 'lucide-react';
+import { ChevronDown, ChevronRight, ArrowRight, ShieldCheck, Users, MessageSquare, Wallet, Wrench, Building2, LayoutGrid, Home, Building, Menu, X } from 'lucide-react';
 import { navigation } from '../../data/navigation';
 
 const deptIcons = {
@@ -20,15 +20,21 @@ const Navbar = () => {
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const [isIndPinned, setIsIndPinned] = useState(false);
   const [activeTab, setActiveTab] = useState(navigation.departments[0].id);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileFeaturesOpen, setMobileFeaturesOpen] = useState(false);
+  const [mobileExpandedDept, setMobileExpandedDept] = useState(null);
   const location = useLocation();
   const megaRef = useRef(null);
 
-  // Close mega menu on route change
+  // Close menus on route change
   useEffect(() => {
     setMegaOpen(false);
     setIsPinned(false);
     setIndustriesOpen(false);
     setIsIndPinned(false);
+    setIsMobileMenuOpen(false);
+    setMobileFeaturesOpen(false);
+    setMobileExpandedDept(null);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -52,13 +58,6 @@ const Navbar = () => {
   }, []);
 
   const activeDept = navigation.departments.find(d => d.id === activeTab);
-
-  const industriesData = [
-    { name: 'Housing Societies', icon: <Home className="w-5 h-5" />, desc: 'Standard residential apartments' },
-    { name: 'Gated Townships', icon: <Building2 className="w-5 h-5" />, desc: 'Large scale townships & villas' },
-    { name: 'Commercial', icon: <Building className="w-5 h-5" />, desc: 'IT parks and corporate spaces' },
-    { name: 'Co-living Spaces', icon: <Users className="w-5 h-5" />, desc: 'PGs and co-living providers' },
-  ];
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 py-3' : 'bg-white py-5'}`}>
@@ -160,15 +159,89 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
-            <button className="text-gray-600 hover:text-gray-900 p-2 focus:outline-none">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-gray-900 hover:text-[#0b6d4b] p-2 focus:outline-none transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
             </button>
           </div>
           
         </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] py-4 px-6 flex flex-col gap-5 max-h-[85vh] overflow-y-auto">
+          
+          {/* Features Accordion */}
+          <div className="flex flex-col">
+            <button 
+              onClick={() => setMobileFeaturesOpen(!mobileFeaturesOpen)}
+              className="w-full font-bold text-gray-800 text-lg flex justify-between items-center transition-colors"
+            >
+              Features <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${mobileFeaturesOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* Departments List */}
+            {mobileFeaturesOpen && (
+              <div className="pl-3 mt-3 flex flex-col gap-3">
+                {navigation.departments.map(dept => (
+                  <div key={dept.id} className="flex flex-col border-l-2 border-gray-100 pl-3">
+                    <button 
+                      onClick={() => setMobileExpandedDept(mobileExpandedDept === dept.id ? null : dept.id)}
+                      className="flex justify-between items-center py-1.5 text-gray-800 font-bold text-[15px]"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span className="text-[#0b6d4b]">{deptIcons[dept.id]}</span>
+                        {dept.label}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${mobileExpandedDept === dept.id ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Features List */}
+                    {mobileExpandedDept === dept.id && (
+                      <div className="pl-6 pt-2 pb-1 flex flex-col gap-3">
+                        {dept.features.map(feat => (
+                          <Link 
+                            key={feat.slug} 
+                            to={`/features/${feat.slug}`}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-gray-600 hover:text-[#0b6d4b] text-[14px] font-semibold flex items-center gap-2"
+                          >
+                            <div className="w-1 h-1 rounded-full bg-gray-400"></div>
+                            {feat.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <Link to="/industries" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-800 text-lg flex justify-between items-center">
+            Industries <ChevronRight className="w-5 h-5 text-gray-400" />
+          </Link>
+          <Link to="/pricing" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-800 text-lg flex justify-between items-center">
+            Pricing <ChevronRight className="w-5 h-5 text-gray-400" />
+          </Link>
+          <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-800 text-lg flex justify-between items-center">
+            About Us <ChevronRight className="w-5 h-5 text-gray-400" />
+          </Link>
+          <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-800 text-lg flex justify-between items-center">
+            Contact <ChevronRight className="w-5 h-5 text-gray-400" />
+          </Link>
+          <hr className="border-gray-100 my-1" />
+          <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-600 text-lg text-center py-2">
+            Sign in
+          </Link>
+          <button className="bg-[#0b6d4b] text-white px-5 py-3.5 rounded-xl font-bold text-[16px] shadow-md shadow-[#0b6d4b]/20 w-full text-center">
+            Book a Demo
+          </button>
+        </div>
+      )}
     </nav>
   );
 };
