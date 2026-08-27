@@ -12,13 +12,13 @@ const slides = [
     title2: '',
     subtitle: 'PREMIUM DOCTORING. FLAWLESS PRINTING.',
     description: 'High-quality Carbon Steel, Stainless Steel, and Polymer doctor blades. Engineered for precise wiping and extended cylinder life in Rotogravure & Flexographic printing.',
-    themeColor: '#1d4ed8',
-    textColor: 'text-blue-950',
-    bgColorClass: 'bg-white/70',
-    pBgClass: 'bg-white/50',
+    themeColor: '#f97316',
+    textColor: 'text-white',
+    bgColorClass: 'bg-orange-600',
+    pBgClass: 'bg-white/40',
     btnText: 'text-white',
-    btnHover: 'hover:bg-blue-800',
-    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    btnHover: 'hover:bg-orange-700 hover:text-white',
+    btnBorderHover: 'hover:bg-orange-500 hover:text-black hover:border-orange-500',
     features: [
       { icon: ShieldCheck, label: 'SUPERIOR EDGE' },
       { icon: Settings, label: 'PRECISE WIPING' },
@@ -36,13 +36,13 @@ const slides = [
     title2: '',
     subtitle: 'HANDHELD & U-TUBE MODELS. PRECISION INSPECTION.',
     description: 'Advanced stroboscope solutions for high-speed motion analysis, quality control and industrial inspection applications.',
-    themeColor: '#1d4ed8',
-    textColor: 'text-blue-950',
-    bgColorClass: 'bg-white/70',
-    pBgClass: 'bg-white/50',
+    themeColor: '#f97316',
+    textColor: 'text-white',
+    bgColorClass: 'bg-orange-600',
+    pBgClass: 'bg-white/40',
     btnText: 'text-white',
-    btnHover: 'hover:bg-blue-800',
-    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    btnHover: 'hover:bg-orange-700 hover:text-white',
+    btnBorderHover: 'hover:bg-orange-500 hover:text-black hover:border-orange-500',
     features: [
       { icon: Target, label: 'HIGH ACCURACY' },
       { icon: ShieldCheck, label: 'RELIABLE & DURABLE' },
@@ -59,13 +59,13 @@ const slides = [
     title2: '',
     subtitle: 'ACCURATE SURFACE TESTING. RELIABLE RESULTS.',
     description: 'Dyne Test Pens ensure precise measurement of surface tension for inks, coatings and treatments. Consistent performance you can trust, every time.',
-    themeColor: '#1d4ed8',
-    textColor: 'text-blue-950',
-    bgColorClass: 'bg-white/70',
-    pBgClass: 'bg-white/50',
+    themeColor: '#f97316',
+    textColor: 'text-white',
+    bgColorClass: 'bg-orange-600',
+    pBgClass: 'bg-white/40',
     btnText: 'text-white',
-    btnHover: 'hover:bg-blue-800',
-    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    btnHover: 'hover:bg-orange-700 hover:text-white',
+    btnBorderHover: 'hover:bg-orange-500 hover:text-black hover:border-orange-500',
     features: [
       { icon: Target, label: 'PRECISE MEASUREMENTS' },
       { icon: ShieldCheck, label: 'CONSISTENT PERFORMANCE' },
@@ -83,13 +83,13 @@ const slides = [
     title2: '',
     subtitle: 'CONSISTENT COATING. PERFECT RESULTS.',
     description: 'High-precision wire wound bar coaters for uniform and accurate coating thickness in laboratories and production environments.',
-    themeColor: '#1d4ed8',
-    textColor: 'text-blue-950',
-    bgColorClass: 'bg-white/70',
-    pBgClass: 'bg-white/50',
+    themeColor: '#f97316',
+    textColor: 'text-white',
+    bgColorClass: 'bg-orange-600',
+    pBgClass: 'bg-white/40',
     btnText: 'text-white',
-    btnHover: 'hover:bg-blue-800',
-    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    btnHover: 'hover:bg-orange-700 hover:text-white',
+    btnBorderHover: 'hover:bg-orange-500 hover:text-black hover:border-orange-500',
     features: [
       { icon: Target, label: 'HIGH PRECISION' },
       { icon: ShieldCheck, label: 'RELIABLE BUILD' },
@@ -106,13 +106,13 @@ const slides = [
     title2: '',
     subtitle: 'PRECISE MEASUREMENT. OPTIMAL FLOW.',
     description: 'High-quality B4 Viscosity Cups for accurate measurement of ink and fluid viscosity. Ensure consistent quality in every batch.',
-    themeColor: '#1d4ed8',
-    textColor: 'text-blue-950',
-    bgColorClass: 'bg-white/70',
-    pBgClass: 'bg-white/50',
+    themeColor: '#f97316',
+    textColor: 'text-white',
+    bgColorClass: 'bg-orange-600',
+    pBgClass: 'bg-white/40',
     btnText: 'text-white',
-    btnHover: 'hover:bg-blue-800',
-    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    btnHover: 'hover:bg-orange-700 hover:text-white',
+    btnBorderHover: 'hover:bg-orange-500 hover:text-black hover:border-orange-500',
     features: [
       { icon: Target, label: 'ACCURATE READING' },
       { icon: ShieldCheck, label: 'BRASS BUILD' },
@@ -152,70 +152,71 @@ const Hero = () => {
               fetchPriority={index === 0 ? "high" : "auto"}
               decoding={index === 0 ? "sync" : "async"}
             />
+            {/* Gradient Overlay for Text Readability - Desktop Only now */}
+            <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
             
-            <div className="max-w-[85rem] w-full mx-auto px-5 sm:px-6 lg:px-8 relative z-20 h-full flex items-start md:items-center">
-              <div className="relative w-full md:w-[50%] lg:w-[45%] mt-0 md:-mt-16 pt-[90px] md:pt-0 pb-4 md:pb-12">
-                 <div className="flex items-center gap-2 mb-1.5">
-                   <div className="w-0.5 h-3" style={{ backgroundColor: slide.themeColor }}></div>
-                   <span className={`${slide.textColor} text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase ${slide.bgColorClass} px-2 py-1 rounded`}>
+            <div className="max-w-[85rem] w-full mx-auto px-4 sm:px-6 lg:px-8 relative z-20 h-full flex items-center md:items-center justify-center md:justify-start">
+              <div className="relative w-full md:w-[50%] lg:w-[45%] bg-white/10 md:bg-transparent backdrop-blur-none p-6 sm:p-8 md:p-0 rounded-[2rem] md:rounded-none shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] md:shadow-none border border-white/40 md:border-none mt-8 md:mt-0 flex flex-col">
+                 <div className="flex items-center gap-2 mb-2 md:mb-1.5">
+                   <div className="w-0.5 h-3 md:h-4" style={{ backgroundColor: slide.themeColor }}></div>
+                   <span className={`${slide.textColor} text-xs md:text-sm font-bold tracking-[0.2em] uppercase ${slide.bgColorClass} px-2 py-1 rounded`}>
                      {slide.tagline}
                    </span>
                  </div>
                  
-                 <h1 className={`${slide.textColor} font-black leading-[1.1] mb-2 md:mb-4`}>
-                   <span className="block text-2xl md:text-4xl lg:text-6xl tracking-tight drop-shadow-md">{slide.title1}</span>
-                   <span className="block text-3xl md:text-5xl lg:text-7xl mt-0 md:mt-1 tracking-tighter" style={{ color: slide.themeColor, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                 <h1 className={`${slide.textColor} font-black leading-[1.1] mb-2 md:mb-4 drop-shadow-sm md:drop-shadow-none`}>
+                   <span className="block text-3xl md:text-4xl lg:text-6xl tracking-tight drop-shadow-md">{slide.title1}</span>
+                   <span className="block text-4xl md:text-5xl lg:text-7xl mt-0 md:mt-1 tracking-tighter drop-shadow-md" style={{ color: slide.themeColor, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                      {slide.titleHighlight}
                    </span>
-                   {slide.title2 && <span className={slide.id === 3 ? "text-xl md:text-3xl lg:text-4xl drop-shadow-md mt-0 md:mt-1" : "drop-shadow-md text-sm md:text-base"}>{slide.title2}</span>}
+                   {slide.title2 && <span className={slide.id === 3 ? "text-2xl md:text-3xl lg:text-4xl drop-shadow-md mt-0 md:mt-1" : "drop-shadow-md text-base md:text-lg"}>{slide.title2}</span>}
                  </h1>
                  
-                 <div className={`text-[10px] md:text-sm font-bold tracking-widest uppercase mb-1 md:mb-2 opacity-90 text-blue-900`}>
+                 <div className={`text-xs md:text-sm font-bold tracking-widest uppercase mb-1 md:mb-2 opacity-100 text-orange-400 drop-shadow-lg`}>
                    {slide.subtitle}
                  </div>
-                 <p className={`hidden md:block font-medium text-xs md:text-sm leading-relaxed mb-6 max-w-sm md:max-w-md ${slide.pBgClass} p-2 rounded-lg text-blue-950 backdrop-blur-sm`}>
+                 <p className={`hidden md:block font-bold text-xs md:text-sm leading-relaxed mb-6 max-w-sm md:max-w-md ${slide.pBgClass} p-2 rounded-lg text-black backdrop-blur-sm`}>
                    {slide.description}
                  </p>
 
-                 <div className="flex flex-wrap gap-2 md:gap-4 lg:gap-8 mb-4 md:mb-8">
+                 <div className="grid grid-cols-2 gap-4 md:flex md:flex-wrap md:gap-4 lg:gap-8 mb-4 md:mb-8 w-full">
                    {slide.features.map((feature, idx) => (
-                     <div key={idx} className="flex flex-col items-center gap-2 text-center">
+                     <div key={idx} className="flex flex-col items-center justify-start gap-2 text-center">
                        <div 
-                         className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors shadow-sm"
+                         className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-colors shadow-sm md:shadow-sm"
                          style={{
                            border: `1px solid ${slide.themeColor}`,
-                           backgroundColor: 'rgba(255,255,255,0.7)',
+                           backgroundColor: 'rgba(255,255,255,0.5)',
                            color: slide.themeColor
                          }}
                        >
-                         <feature.icon className="w-4 h-4" strokeWidth={1.5} />
+                         <feature.icon className="w-6 h-6 md:w-7 md:h-7" strokeWidth={1.5} />
                        </div>
-                       <div className={`text-blue-950 text-[8px] md:text-[10px] font-bold uppercase tracking-wider leading-tight max-w-[60px] md:max-w-[80px]`}>
+                       <div className={`text-black text-[10px] md:text-xs font-black uppercase tracking-wider leading-tight max-w-[70px] md:max-w-[80px] drop-shadow-md`}>
                          {feature.label}
                        </div>
                      </div>
                    ))}
                  </div>
 
-                 <div className="flex flex-wrap gap-3 mt-2">
-                   <button 
-                     onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
-                     className={`flex items-center justify-center gap-2 px-4 py-2 md:px-6 md:py-2.5 rounded transition-colors font-bold tracking-widest text-[10px] md:text-xs uppercase shadow-md flex-1 md:flex-none ${slide.btnText} ${slide.btnHover}`}
-                     style={{ backgroundColor: slide.themeColor }}
-                   >
-                     ENQUIRE NOW <ArrowRight className="w-3 h-3 ml-1" />
-                   </button>
-                   <Link 
-                     to="/products"
-                     className={`flex items-center justify-center gap-2 border px-4 py-2 md:px-6 md:py-2.5 rounded transition-colors font-bold tracking-widest text-[10px] md:text-xs uppercase shadow-sm group flex-1 md:flex-none ${slide.btnBorderHover}`}
-                     style={{ 
-                       borderColor: slide.themeColor,
-                       color: '#0f172a'
-                     }}
-                   >
-                     EXPLORE PRODUCTS <ArrowRight className="w-3 h-3 ml-1" />
-                   </Link>
-                 </div>
+                   <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-2">
+                     <button 
+                       onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
+                       className={`flex items-center justify-center gap-2 px-4 py-3 md:px-6 md:py-2.5 rounded-xl md:rounded transition-colors font-bold tracking-widest text-[13px] md:text-sm uppercase shadow-md w-full sm:w-auto ${slide.btnText} ${slide.btnHover}`}
+                       style={{ backgroundColor: slide.themeColor }}
+                     >
+                       ENQUIRE NOW <ArrowRight className="w-4 h-4 md:w-4 md:h-4 ml-1" />
+                     </button>
+                     <Link 
+                       to="/products"
+                       className={`flex items-center justify-center gap-2 border-2 md:border px-4 py-3 md:px-6 md:py-2.5 rounded-xl md:rounded transition-colors font-bold tracking-widest text-[13px] md:text-sm uppercase shadow-sm group w-full sm:w-auto text-black hover:bg-orange-500 hover:border-orange-500`}
+                       style={{ 
+                         borderColor: slide.themeColor
+                       }}
+                     >
+                       EXPLORE PRODUCTS <ArrowRight className="w-4 h-4 md:w-4 md:h-4 ml-1" />
+                     </Link>
+                   </div>
               </div>
             </div>
           </div>
@@ -223,16 +224,16 @@ const Hero = () => {
       </div>
 
       {/* Slide Indicators & Navigation */}
-      <div className="absolute top-[30%] right-8 z-30 flex flex-col gap-4">
-        <button onClick={prevSlide} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 md:bottom-auto md:top-[50%] md:-translate-y-1/2 md:left-auto md:right-8 z-30 flex flex-row md:flex-col items-center gap-3 md:gap-4 w-full justify-center md:w-auto px-4 md:px-0">
+        <button onClick={prevSlide} className="w-10 h-10 rounded-full bg-black/40 md:bg-white/5 border border-white/20 md:border-white/10 flex items-center justify-center text-white md:text-white/50 hover:text-white hover:bg-black/60 transition-all backdrop-blur-sm shadow-lg">
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <div className="flex flex-col items-center justify-center text-xs font-bold tracking-widest text-white/50 gap-1">
-          <span style={{ color: slides[currentSlide].themeColor }}>{(currentSlide + 1).toString().padStart(2, '0')}</span>
-          <span className="w-4 h-[1px] bg-white/20"></span>
+        <div className="flex flex-row md:flex-col items-center justify-center text-xs font-bold tracking-widest text-white md:text-white/50 gap-2 md:gap-1 bg-black/40 md:bg-transparent px-4 py-2 md:px-0 md:py-0 rounded-full backdrop-blur-sm md:backdrop-blur-none shadow-lg md:shadow-none">
+          <span style={{ color: slides[currentSlide].themeColor }} className="drop-shadow-md md:drop-shadow-none">{(currentSlide + 1).toString().padStart(2, '0')}</span>
+          <span className="w-4 h-[1px] bg-white/50 md:bg-white/20"></span>
           <span>{totalSlides.toString().padStart(2, '0')}</span>
         </div>
-        <button onClick={nextSlide} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all">
+        <button onClick={nextSlide} className="w-10 h-10 rounded-full bg-black/40 md:bg-white/5 border border-white/20 md:border-white/10 flex items-center justify-center text-white md:text-white/50 hover:text-white hover:bg-black/60 transition-all backdrop-blur-sm shadow-lg">
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
