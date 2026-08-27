@@ -1,279 +1,371 @@
 import React, { useEffect } from 'react';
-import { Shield, Target, Eye, Users, Zap, CheckCircle2, Lock, Server, Cloud, Database } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  Calendar, Award, ShieldCheck, MapPin, Shield,
+  FileText, Repeat, Flashlight, Ruler, Activity, Droplet, Box,
+  CheckCircle2, Eye, Target, Trophy, Handshake, Check
+} from 'lucide-react';
 
 export default function About() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const features = [
-    'Smart Visitor Management',
-    'Digital Billing & Accounting',
-    'Maintenance & Complaint Tracking',
-    'Resident Communication',
-    'QR-Based Visitor Entry',
-    'Staff & Security Management',
-    'Notice Board & Announcements',
-    'Emergency SOS',
-    'Role-Based Access Control',
-    'Mobile App & Progressive Web App (PWA)',
-    'Secure Cloud Infrastructure',
-    'Regular Data Backups'
-  ];
-
-  const values = [
+  const products = [
     {
-      title: 'Trust & Security',
-      desc: 'We design every feature with privacy, security, and reliability at its core.',
-      icon: Shield
+      title: 'Doctor Blade - Wipox Brand',
+      desc: 'High-performance doctor blades engineered for gravure and printing applications, ensuring smooth ink transfer and consistent print quality.',
+      icon: FileText
     },
     {
-      title: 'Community First',
-      desc: 'Every decision we make is focused on creating a better experience for residents, management committees, and security staff.',
-      icon: Users
+      title: 'Ink Mixing Rollers',
+      desc: 'Precision-manufactured rollers designed for efficient ink circulation and uniform mixing in printing processes.',
+      icon: Repeat
     },
     {
-      title: 'Simplicity',
-      desc: 'Technology should simplify everyday tasks, not make them more complicated.',
-      icon: Zap
+      title: 'Stroboscopes',
+      desc: 'Advanced LED and Xenon Flash Tube stroboscopes for accurate speed measurement, motion inspection, and production quality control.',
+      icon: Flashlight
     },
     {
-      title: 'Continuous Innovation',
-      desc: 'We are constantly improving SocietyMates with new features, better performance, and modern user experiences.',
-      icon: Target
-    }
-  ];
-
-  const faqs = [
-    {
-      q: "Is SocietyMates suitable for societies of all sizes?",
-      a: "Yes. SocietyMates is designed to support residential communities of different sizes, from small apartment complexes to large gated societies."
+      title: 'Bar Coaters',
+      desc: 'Laboratory coating instruments designed for uniform film application and testing of coatings, inks, paints, and related materials.',
+      icon: Ruler
     },
     {
-      q: "Is resident information secure?",
-      a: "Yes. We follow industry-standard security practices to protect user data and ensure secure access."
+      title: 'GSM Cutters & Testing Instruments',
+      desc: 'Reliable quality control instruments used for accurate material testing in fabric, paper, and other industries.',
+      icon: Activity
     },
     {
-      q: "Can committee members control user permissions?",
-      a: "Yes. Different roles and permission levels can be assigned based on responsibilities."
+      title: 'Dyne Test Pens - Magnet Brand',
+      desc: 'Professional surface energy testing solutions used to measure surface tension and check surface treatment quality on films, plastics, and packaging materials.',
+      icon: Droplet
     },
     {
-      q: "Is there a mobile app?",
-      a: "Yes. SocietyMates is available as a Progressive Web App (PWA), allowing users to install it directly from their browser without visiting an app store."
-    },
-    {
-      q: "Who owns the society's data?",
-      a: "The society always owns its data. SocietyMates only provides the secure platform to manage it."
+      title: 'Flexible Packaging Industry Solutions',
+      desc: 'Specialized products developed to support printing and packaging applications with improved efficiency and reliability.',
+      icon: Box
     }
   ];
 
   return (
-    <div className="pt-20 pb-16 bg-white min-h-screen text-slate-900 animate-[fadeIn_0.5s_ease-out] relative overflow-hidden">
+    <div className="pt-24 pb-16 bg-white min-h-screen text-black font-sans relative overflow-hidden">
       
       {/* Background Decorative Elements */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-[#e6f5ef] to-transparent rounded-full blur-[100px] opacity-60 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-      <div className="absolute top-1/2 left-0 w-[800px] h-[800px] bg-[#0b6d4b] rounded-full blur-[150px] opacity-[0.03] -translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-50 rounded-full blur-[120px] opacity-70 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-yellow-50 rounded-full blur-[100px] opacity-50 -translate-x-1/2 pointer-events-none"></div>
 
-      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* 1. Hero Section */}
+      <div className="max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 relative mb-24">
         
-        {/* Premium Centered Hero Section */}
-        <div className="relative z-10 pt-16 pb-24 text-center max-w-5xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#e6f5ef] text-[#0b6d4b] text-[13px] font-black tracking-widest uppercase mb-8 border border-[#0b6d4b]/20 shadow-sm">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#0b6d4b] animate-pulse"></span>
-            About SocietyMates
-          </div>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-[14px] font-bold text-gray-500 mb-8 mt-4">
+          <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
+          <span>›</span>
+          <span className="text-blue-600">About Us</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           
-          {/* Headline */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[1.05] mb-10">
-            Building the Future of <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0b6d4b] to-[#1cd78d]">Community Living.</span>
-          </h1>
-          
-          {/* Subheading */}
-          <p className="text-xl md:text-[22px] text-slate-600 leading-relaxed font-bold max-w-3xl mx-auto mb-16">
-            SocietyMates is a smart society management platform developed by Prime Impact Solutions to simplify the way residential communities operate.
-          </p>
-
-          {/* Intro Box */}
-          <div className="bg-white border-2 border-gray-100 p-10 md:p-14 rounded-[3rem] shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgba(11,109,75,0.1)] transition-all duration-500 max-w-4xl mx-auto relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#0b6d4b] to-[#1cd78d]"></div>
-            <p className="text-[17px] md:text-[20px] text-gray-700 leading-relaxed font-bold relative z-10">
-              Managing a housing society often involves multiple tools, paperwork, and constant coordination between residents, committee members, and security staff. We believe there is a better way. <span className="text-[#0b6d4b] font-black">That's why we built SocietyMates</span> — a single platform that brings visitor management, billing, maintenance, communication, security, and daily operations together in one seamless experience.
+          {/* Left Text */}
+          <div className="lg:pr-10">
+            <h1 className="text-4xl md:text-5xl font-black text-black mb-4 leading-tight tracking-tight">
+              About <br className="hidden md:block" />
+              <span className="text-[#1e3a8a]">ImageTech Industries</span>
+            </h1>
+            <p className="text-[#1e3a8a] font-bold text-lg mb-8">
+              Precision Engineering Solutions Since 1992
             </p>
-          </div>
-        </div>
-
-        {/* Mission & Vision Section (Elevated Cards) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-24">
-          <div className="group bg-white p-10 md:p-12 rounded-[2.5rem] border-2 border-gray-100 relative overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:border-[#0b6d4b] shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgba(11,109,75,0.15)]">
-            <div className="w-20 h-20 bg-gray-50 rounded-3xl border-2 border-gray-100 flex items-center justify-center mb-8 shadow-sm group-hover:bg-[#0b6d4b] group-hover:border-[#0b6d4b] transition-all duration-500 group-hover:scale-110">
-              <Target size={40} className="text-[#0b6d4b] group-hover:text-white transition-colors" />
-            </div>
-            <h2 className="text-4xl font-black text-black mb-5 tracking-tight">Our Mission</h2>
-            <p className="text-lg text-gray-600 font-bold leading-relaxed">
-              To empower residential communities with modern technology that improves transparency, security, communication, and operational efficiency.
+            
+            <p className="text-gray-700 font-medium text-[16px] leading-relaxed mb-6">
+              ImageTech Industries is a Delhi-based manufacturing powerhouse dedicated to delivering reliable, innovative, and high-performance industrial solutions.
             </p>
-          </div>
-          <div className="group bg-white p-10 md:p-12 rounded-[2.5rem] border-2 border-gray-100 relative overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:border-[#0b6d4b] shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgba(11,109,75,0.15)]">
-            <div className="w-20 h-20 bg-gray-50 rounded-3xl border-2 border-gray-100 flex items-center justify-center mb-8 shadow-sm group-hover:bg-[#0b6d4b] group-hover:border-[#0b6d4b] transition-all duration-500 group-hover:scale-110">
-              <Eye size={40} className="text-[#0b6d4b] group-hover:text-white transition-colors" />
-            </div>
-            <h2 className="text-4xl font-black text-black mb-5 tracking-tight">Our Vision</h2>
-            <p className="text-lg text-gray-600 font-bold leading-relaxed">
-              To become the most trusted digital platform for residential societies by making community living simpler, safer, and more connected.
+            <p className="text-gray-700 font-medium text-[16px] leading-relaxed mb-12">
+              With a strong foundation built over decades of engineering excellence, we design precision products that maximize productivity and accuracy.
             </p>
-          </div>
-        </div>
 
-        {/* Why We Built & Built By - Asymmetrical Layout */}
-        <div className="max-w-6xl mx-auto bg-gray-900 rounded-[3rem] p-2 border-4 border-gray-800 shadow-2xl mb-32 overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-full bg-[#0b6d4b] opacity-10 pointer-events-none"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 relative z-10">
-            
-            <div className="p-12 md:p-16 flex flex-col justify-center">
-              <h2 className="text-3xl md:text-4xl font-black text-white mb-6 tracking-tight">Why We Built SocietyMates</h2>
-              <div className="w-16 h-1.5 bg-[#0b6d4b] mb-8 rounded-full"></div>
-              <p className="text-xl text-gray-300 font-bold leading-relaxed mb-6">
-                Residential communities deserve software that is easy to use, reliable, and built for everyday life.
-              </p>
-              <p className="text-[17px] text-gray-400 font-medium leading-relaxed">
-                SocietyMates was created to eliminate manual work, reduce operational complexity, and help committees focus on building better communities instead of managing paperwork.
-              </p>
-            </div>
-            
-            <div className="bg-white m-2 rounded-[2.5rem] p-10 md:p-14 shadow-inner flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 text-[12px] font-black tracking-widest uppercase mb-4">
-                The Creators
-              </div>
-              <h2 className="text-3xl font-black text-black mb-6 tracking-tight">Built by Prime Impact Solutions</h2>
-              <p className="text-lg text-gray-700 font-bold leading-relaxed mb-4">
-                SocietyMates is proudly developed by Prime Impact Solutions, a software company focused on building secure, scalable, and user-friendly digital solutions.
-              </p>
-              <p className="text-md text-gray-600 font-bold leading-relaxed">
-                We specialize in web applications, mobile apps, enterprise software, automation, and cloud-based platforms that solve real business and community challenges.
-              </p>
-            </div>
-            
-          </div>
-        </div>
-
-        {/* Core Values Section */}
-        <div className="max-w-7xl mx-auto mb-32">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-black mb-4 tracking-tight">Our Core Values</h2>
-            <p className="text-xl text-gray-600 font-bold">The principles that guide everything we build.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((val, idx) => {
-              const Icon = val.icon;
-              return (
-                <div key={idx} className="bg-white p-8 rounded-3xl border-2 border-gray-100 shadow-sm hover:border-[#0b6d4b] hover:-translate-y-2 transition-all duration-300 group">
-                  <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#0b6d4b] transition-colors duration-300 border border-gray-200 group-hover:shadow-[0_10px_20px_rgba(11,109,75,0.2)]">
-                    <Icon size={32} className="text-[#0b6d4b] group-hover:text-white transition-colors" />
-                  </div>
-                  <h3 className="text-2xl font-black text-black mb-4 tracking-tight">{val.title}</h3>
-                  <p className="text-gray-600 font-bold leading-relaxed text-[15px]">{val.desc}</p>
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+              <div className="flex flex-col items-center">
+                <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-[#1e3a8a] mb-3">
+                  <Calendar className="w-6 h-6" />
                 </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Features & Security (Split Layout) */}
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 mb-32">
-          
-          {/* Features Side */}
-          <div className="bg-gray-50 p-10 md:p-14 rounded-[3rem] border-2 border-gray-100">
-            <h2 className="text-3xl font-black text-black mb-10 tracking-tight">Why Choose SocietyMates?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4">
-              {features.map((feat, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[#0b6d4b] flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                    <CheckCircle2 size={14} className="text-white" />
-                  </div>
-                  <span className="text-black font-black text-[15px] leading-tight">{feat}</span>
+                <h4 className="font-black text-xl text-black">1992</h4>
+                <p className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Established</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-14 h-14 bg-yellow-50 rounded-full flex items-center justify-center text-yellow-600 mb-3">
+                  <Award className="w-6 h-6" />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Security Side */}
-          <div className="bg-[#0b6d4b] p-10 md:p-14 rounded-[3rem] text-white shadow-[0_30px_60px_rgba(11,109,75,0.25)] relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-[100px] opacity-10 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-            
-            <div className="relative z-10">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-8 border border-white/20 backdrop-blur-sm">
-                <Shield size={32} className="text-[#1cd78d]" />
+                <h4 className="font-black text-xl text-black">30+</h4>
+                <p className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Years of Experience</p>
               </div>
-              <h2 className="text-3xl font-black text-white mb-6 tracking-tight">
-                Security & Trust
-              </h2>
-              <p className="text-green-50 font-bold text-[17px] mb-10 leading-relaxed max-w-md">
-                Keeping your community data safe is our highest priority. As we grow, privacy will continue to remain at the heart of everything we build.
-              </p>
-              
-              <p className="font-black mb-5 uppercase tracking-widest text-[12px] text-[#1cd78d]">Built With Enterprise Security</p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-4">
-                {['Secure authentication', 'Encrypted communication', 'Role-based permissions', 'Activity & audit logs', 'Automated backups', 'Reliable cloud infrastructure'].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded flex items-center justify-center shrink-0 bg-[#1cd78d]/20 border border-[#1cd78d]/50">
-                      <Lock size={12} className="text-[#1cd78d]" />
-                    </div>
-                    <span className="text-white font-bold text-[14px] leading-tight">{item}</span>
-                  </div>
-                ))}
+              <div className="flex flex-col items-center">
+                <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-[#1e3a8a] mb-3">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <h4 className="font-black text-xl text-black">Trusted</h4>
+                <p className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">By Industries</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-14 h-14 bg-yellow-50 rounded-full flex items-center justify-center text-yellow-600 mb-3">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <h4 className="font-black text-xl text-black">Made in India</h4>
+                <p className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">With Pride</p>
               </div>
             </div>
           </div>
 
-        </div>
-
-        {/* FAQ Section */}
-        <div className="max-w-4xl mx-auto mb-24">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-black text-black mb-4 tracking-tight">Frequently Asked Questions</h2>
-            <p className="text-lg text-gray-600 font-bold">Everything you need to know about SocietyMates.</p>
+          {/* Right Image Layout */}
+          <div className="relative rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl h-[400px] md:h-[500px] bg-gray-100 group border-4 border-white">
+            <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none"></div>
+            <img 
+              src="/images/about-hero.jpg" 
+              alt="Factory Floor" 
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            {/* Floating Badge */}
+            <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-xl p-5 rounded-2xl shadow-xl flex items-center gap-4 z-20 border border-white/50">
+               <div className="w-12 h-12 bg-[#1e3a8a] rounded-xl flex items-center justify-center text-white shrink-0 shadow-md">
+                 <Shield className="w-6 h-6" />
+               </div>
+               <div>
+                 <h4 className="text-[#1e3a8a] font-black text-[17px] tracking-tight">Delivering Excellence</h4>
+                 <p className="text-gray-600 text-[13px] font-bold">In Every Product We Manufacture</p>
+               </div>
+            </div>
           </div>
-          <div className="space-y-4">
-            {faqs.map((faq, i) => (
-              <details key={i} className="group bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-[0_5px_15px_rgba(0,0,0,0.02)] [&_summary::-webkit-details-marker]:hidden cursor-pointer hover:border-[#0b6d4b] transition-colors">
-                <summary className="flex items-center justify-between font-black text-black text-[17px]">
-                  {faq.q}
-                  <span className="ml-4 flex-shrink-0 bg-gray-50 border-2 border-gray-100 rounded-full p-2 group-open:-rotate-180 group-open:bg-[#0b6d4b] group-open:border-[#0b6d4b] group-open:text-white transition-all duration-300 text-gray-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </span>
-                </summary>
-                <p className="mt-5 text-gray-600 font-bold leading-relaxed text-[16px] pr-8">
-                  {faq.a}
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
-
-        {/* High-Impact CTA Section */}
-        <div className="bg-[#0b6d4b] rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden max-w-5xl mx-auto shadow-[0_30px_60px_rgba(11,109,75,0.25)] border-4 border-white">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white rounded-full blur-[100px] opacity-10 translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
           
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tighter">Join Us From Day One</h2>
-            <p className="text-lg md:text-xl text-green-100 font-bold max-w-3xl mx-auto mb-10 leading-relaxed">
-              We're just getting started, and we'd love to build the future of community living with you. Whether you're managing a small apartment complex or a large residential society, SocietyMates is here to simplify operations, improve communication, and strengthen security.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button className="w-full sm:w-auto px-10 py-5 bg-white text-[#0b6d4b] rounded-2xl font-black text-[17px] transition-all shadow-xl hover:scale-105 hover:bg-gray-50">
-                Start Your Journey Today
-              </button>
-            </div>
-          </div>
         </div>
-
       </div>
+
+      {/* 2. Our Product Expertise */}
+      <div className="max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-black text-black mb-4">Our Product Expertise</h2>
+          <div className="w-16 h-1 bg-yellow-500 mx-auto"></div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {products.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <div key={idx} className="bg-white border border-gray-100 rounded-2xl p-6 lg:p-8 flex items-start gap-5 hover:shadow-[0_20px_40px_-15px_rgba(30,58,138,0.15)] hover:border-blue-100 transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-y-1/2 translate-x-1/2"></div>
+                <div className="w-14 h-14 bg-blue-50/50 rounded-xl flex items-center justify-center text-[#1e3a8a] shrink-0 border border-blue-100/50 group-hover:bg-[#1e3a8a] group-hover:text-white transition-colors duration-300 relative z-10">
+                  <Icon className="w-6 h-6" />
+                </div>
+                <div className="relative z-10">
+                  <h3 className="font-black text-[17px] text-[#1e3a8a] mb-2">{item.title}</h3>
+                  <p className="text-gray-600 font-semibold text-[14.5px] leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Manufacturing Strength & Industries We Serve */}
+      <div className="bg-gray-50 py-20 mb-24">
+        <div className="max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+            
+            {/* Left: Manufacturing Strength */}
+            <div>
+              <h2 className="text-3xl font-black text-[#1e3a8a] mb-6">Our Manufacturing Strength</h2>
+              <p className="text-gray-700 font-medium text-[15px] leading-relaxed mb-6">
+                At ImageTech Industries, we combine engineering expertise, manufacturing experience, and continuous improvement to create products that deliver dependable performance.
+              </p>
+              <p className="text-black font-bold text-[15px] mb-6">Our capabilities include:</p>
+              
+              <ul className="space-y-4 mb-8">
+                {[
+                  'Precision manufacturing',
+                  'Application-based product development',
+                  'Customized engineering solutions',
+                  'Quality inspection at every stage',
+                  'Reliable customer support'
+                ].map((point, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                     <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                       <CheckCircle2 className="w-3.5 h-3.5" />
+                     </div>
+                     <span className="text-gray-800 font-bold text-[15px]">{point}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <p className="text-gray-700 font-medium text-[15px] leading-relaxed">
+                Each product is designed with focus on <span className="text-[#1e3a8a] font-bold">accuracy, durability, and long-term industrial performance.</span>
+              </p>
+            </div>
+
+            {/* Right: Industries We Serve */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-10 shadow-sm relative overflow-hidden">
+              <h2 className="text-2xl font-black text-[#1e3a8a] mb-6 relative z-10">Industries We Serve</h2>
+              <p className="text-gray-700 font-medium text-[15px] mb-6 relative z-10">Our solutions support:</p>
+              
+              <ul className="space-y-4 relative z-10">
+                {[
+                  'Flexible Packaging Industry',
+                  'Gravure & Printing Industry',
+                  'Textile Industry',
+                  'Paper Industry',
+                  'Plastic Film Industry',
+                  'Laboratory & R&D Applications',
+                  'Manufacturing & Quality Control Industries'
+                ].map((point, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                     <div className="w-2 h-2 rounded-full bg-yellow-500 shrink-0"></div>
+                     <span className="text-gray-800 font-bold text-[15px]">{point}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Decorative Factory Graphic */}
+              <div className="absolute bottom-6 right-6 opacity-5 pointer-events-none w-48 h-48">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="w-full h-full text-black">
+                   <path d="M2 20h20M4 20V8l6-4 6 4v12M16 12l6 3v5" />
+                   <path d="M9 20v-6h2v6" />
+                   <path d="M9 10h.01M13 10h.01" />
+                 </svg>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Quality Commitment */}
+      <div className="max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-black text-black mb-4">Quality Commitment</h2>
+          <div className="w-16 h-1 bg-yellow-500 mx-auto"></div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          
+          {/* Left: Text */}
+          <div className="order-2 lg:order-1">
+            <p className="text-gray-700 font-medium text-[15px] leading-relaxed mb-6">
+              Quality is the foundation of ImageTech Industries.
+            </p>
+            <p className="text-gray-700 font-medium text-[15px] leading-relaxed mb-6">
+              We focus on:
+            </p>
+            
+            <ul className="space-y-4 mb-8">
+              {[
+                'Consistent product performance',
+                'Precision engineering',
+                'Suitable material selection',
+                'Continuous product improvement',
+                'Customer satisfaction'
+              ].map((point, i) => (
+                <li key={i} className="flex items-center gap-3">
+                   <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                     <CheckCircle2 className="w-3.5 h-3.5" />
+                   </div>
+                   <span className="text-gray-800 font-bold text-[15px]">{point}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="text-gray-700 font-medium text-[15px] leading-relaxed">
+              Our objective is to deliver products that help industries improve efficiency and maintain high-quality standards.
+            </p>
+          </div>
+
+          {/* Right: Image Layout */}
+          <div className="order-1 lg:order-2 relative rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl h-[350px] bg-gray-100 group border-4 border-white">
+             <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none"></div>
+             <img 
+              src="/images/about-quality.jpg" 
+              alt="Quality Assurance Lab" 
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            {/* Floating Badge */}
+            <div className="absolute bottom-6 left-6 right-6 bg-[#1e3a8a]/95 backdrop-blur-md p-5 rounded-2xl text-white flex items-center gap-4 z-20 shadow-xl border border-blue-800">
+               <div className="w-12 h-12 rounded-xl flex items-center justify-center border border-white/20 shrink-0 bg-white/10">
+                 <ShieldCheck className="w-6 h-6 text-white" />
+               </div>
+               <div>
+                 <h4 className="font-black text-[17px] tracking-tight">Quality Assured</h4>
+                 <p className="text-blue-100 text-[13px] font-bold">Tested. Trusted. Delivered.</p>
+               </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 5. Bottom 4-Column Section (Vision, Mission, etc) */}
+      <div className="max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div className="border-t border-gray-100 pt-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 text-center lg:text-left">
+            
+            {/* Vision */}
+            <div className="flex flex-col items-center lg:items-start">
+              <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-[#1e3a8a] mb-6">
+                <Eye className="w-6 h-6" />
+              </div>
+              <h3 className="font-black text-[#1e3a8a] text-[18px] mb-4">Our Vision</h3>
+              <p className="text-gray-700 text-[14px] font-medium leading-relaxed">
+                To establish ImageTech Industries as a trusted Indian manufacturing brand recognized for precision engineering, innovation, and dependable industrial solutions worldwide.
+              </p>
+            </div>
+
+            {/* Mission */}
+            <div className="flex flex-col items-center lg:items-start">
+              <div className="w-14 h-14 bg-yellow-50 rounded-full flex items-center justify-center text-yellow-600 mb-6">
+                <Target className="w-6 h-6" />
+              </div>
+              <h3 className="font-black text-[#1e3a8a] text-[18px] mb-4">Our Mission</h3>
+              <p className="text-gray-700 text-[14px] font-medium leading-relaxed">
+                To manufacture high-quality industrial products by combining technology, experience, and customer requirements while maintaining excellence in quality and service.
+              </p>
+            </div>
+
+            {/* Why Choose Us */}
+            <div className="flex flex-col items-center lg:items-start">
+              <div className="w-14 h-14 bg-yellow-50 rounded-full flex items-center justify-center text-yellow-600 mb-6">
+                <Trophy className="w-6 h-6" />
+              </div>
+              <h3 className="font-black text-[#1e3a8a] text-[18px] mb-4">Why Choose Us?</h3>
+              <ul className="space-y-3 w-full inline-block text-left">
+                {[
+                  '30+ Years of Manufacturing Experience',
+                  'Innovation & Development',
+                  'Customer-Focused Approach',
+                  'Made In India Excellence'
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
+                    <span className="text-gray-700 text-[14px] font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Built on Trust */}
+            <div className="flex flex-col items-center lg:items-start">
+              <div className="w-14 h-14 bg-yellow-50 rounded-full flex items-center justify-center text-yellow-600 mb-6">
+                <Handshake className="w-6 h-6" />
+              </div>
+              <h3 className="font-black text-[#1e3a8a] text-[18px] mb-4">Built on Trust</h3>
+              <p className="text-gray-700 text-[14px] font-medium leading-relaxed">
+                A legacy of engineering knowledge and industrial expertise since 1992.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

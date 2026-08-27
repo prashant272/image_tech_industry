@@ -1,269 +1,242 @@
 import React, { useState, useEffect } from 'react';
-import { Play, CheckCircle2, Bell, Users, Wrench, CreditCard, Home, FileText, AlertCircle, Grid, Calendar, ChevronRight, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, ArrowRight, ShieldCheck, Target, Settings, Droplet, Zap, CheckCircle2, Printer } from 'lucide-react';
+
+const slides = [
+  {
+    id: 1,
+    image: '/hero-image.jpg',
+    tagline: 'IMAGETECH INDUSTRIES',
+    title1: 'WIPEX DOCTOR',
+    titleHighlight: 'BLADES',
+    title2: '',
+    subtitle: 'PREMIUM DOCTORING. FLAWLESS PRINTING.',
+    description: 'High-quality Carbon Steel, Stainless Steel, and Polymer doctor blades. Engineered for precise wiping and extended cylinder life in Rotogravure & Flexographic printing.',
+    themeColor: '#1d4ed8',
+    textColor: 'text-blue-950',
+    bgColorClass: 'bg-white/70',
+    pBgClass: 'bg-white/50',
+    btnText: 'text-white',
+    btnHover: 'hover:bg-blue-800',
+    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    features: [
+      { icon: ShieldCheck, label: 'SUPERIOR EDGE' },
+      { icon: Settings, label: 'PRECISE WIPING' },
+      { icon: ShieldCheck, label: 'CYLINDER SAFE' },
+      { icon: Zap, label: 'LONG LASTING' },
+    ]
+  },
+
+  {
+    id: 3,
+    image: '/hero-stroboscope.jpg',
+    tagline: 'IMAGETECH INDUSTRIES',
+    title1: 'INDUSTRIAL',
+    titleHighlight: 'STROBOSCOPES',
+    title2: '',
+    subtitle: 'HANDHELD & U-TUBE MODELS. PRECISION INSPECTION.',
+    description: 'Advanced stroboscope solutions for high-speed motion analysis, quality control and industrial inspection applications.',
+    themeColor: '#1d4ed8',
+    textColor: 'text-blue-950',
+    bgColorClass: 'bg-white/70',
+    pBgClass: 'bg-white/50',
+    btnText: 'text-white',
+    btnHover: 'hover:bg-blue-800',
+    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    features: [
+      { icon: Target, label: 'HIGH ACCURACY' },
+      { icon: ShieldCheck, label: 'RELIABLE & DURABLE' },
+      { icon: Zap, label: 'WIDE SPEED RANGE' },
+      { icon: Settings, label: 'BUILT FOR INDUSTRY' },
+    ]
+  },
+  {
+    id: 4,
+    image: '/hero-dyne-pen.jpg',
+    tagline: 'IMAGETECH INDUSTRIES',
+    title1: 'DYNE',
+    titleHighlight: 'TEST PENS',
+    title2: '',
+    subtitle: 'ACCURATE SURFACE TESTING. RELIABLE RESULTS.',
+    description: 'Dyne Test Pens ensure precise measurement of surface tension for inks, coatings and treatments. Consistent performance you can trust, every time.',
+    themeColor: '#1d4ed8',
+    textColor: 'text-blue-950',
+    bgColorClass: 'bg-white/70',
+    pBgClass: 'bg-white/50',
+    btnText: 'text-white',
+    btnHover: 'hover:bg-blue-800',
+    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    features: [
+      { icon: Target, label: 'PRECISE MEASUREMENTS' },
+      { icon: ShieldCheck, label: 'CONSISTENT PERFORMANCE' },
+      { icon: CheckCircle2, label: 'EASY TO USE' },
+      { icon: Settings, label: 'VERSATILE INKS' },
+    ]
+  },
+
+  {
+    id: 6,
+    image: '/hero-bar-coater.jpg',
+    tagline: 'IMAGETECH INDUSTRIES',
+    title1: 'PREMIUM',
+    titleHighlight: 'BAR COATERS',
+    title2: '',
+    subtitle: 'CONSISTENT COATING. PERFECT RESULTS.',
+    description: 'High-precision wire wound bar coaters for uniform and accurate coating thickness in laboratories and production environments.',
+    themeColor: '#1d4ed8',
+    textColor: 'text-blue-950',
+    bgColorClass: 'bg-white/70',
+    pBgClass: 'bg-white/50',
+    btnText: 'text-white',
+    btnHover: 'hover:bg-blue-800',
+    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    features: [
+      { icon: Target, label: 'HIGH PRECISION' },
+      { icon: ShieldCheck, label: 'RELIABLE BUILD' },
+      { icon: CheckCircle2, label: 'EASY TO USE' },
+      { icon: Settings, label: 'UNIFORM COATING' },
+    ]
+  },
+  {
+    id: 7,
+    image: '/hero-viscosity-cup.jpg',
+    tagline: 'IMAGETECH INDUSTRIES',
+    title1: 'B4',
+    titleHighlight: 'VISCOSITY CUP',
+    title2: '',
+    subtitle: 'PRECISE MEASUREMENT. OPTIMAL FLOW.',
+    description: 'High-quality B4 Viscosity Cups for accurate measurement of ink and fluid viscosity. Ensure consistent quality in every batch.',
+    themeColor: '#1d4ed8',
+    textColor: 'text-blue-950',
+    bgColorClass: 'bg-white/70',
+    pBgClass: 'bg-white/50',
+    btnText: 'text-white',
+    btnHover: 'hover:bg-blue-800',
+    btnBorderHover: 'hover:bg-blue-800 hover:text-white hover:border-blue-800',
+    features: [
+      { icon: Target, label: 'ACCURATE READING' },
+      { icon: ShieldCheck, label: 'BRASS BUILD' },
+      { icon: CheckCircle2, label: 'EASY TO CLEAN' },
+      { icon: Settings, label: 'CONSISTENT FLOW' },
+    ]
+  }
+];
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slideImages = [
-    '/images/generated/mob_admin_dash_1783765484092.png',
-    '/images/generated/mob_admin_members_1783765494709.png',
-    '/images/generated/mob_resident_home_1783765505611.png',
-    '/images/generated/mob_resident_visitor_1783765515835.png',
-    '/images/generated/mob_guard_scan_1783765527933.png',
-    '/images/generated/mob_guard_log_1783765540033.png',
-    '/images/generated/acc_mobile.png',
-    '/images/generated/com_mobile.png'
-  ];
-
-  const totalSlides = slideImages.length + 1; // +1 for the custom HTML slide
+  const totalSlides = slides.length;
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 3000);
+    }, 6000); 
     return () => clearInterval(timer);
   }, [totalSlides]);
 
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+
   return (
-    <section id="home" className="pt-20 pb-8 lg:pt-20 lg:pb-10 overflow-hidden relative bg-[#f8fafc]">
-      {/* Background shape */}
-      <div className="absolute right-0 bottom-0 w-[100%] lg:w-[50%] h-[50%] lg:h-[80%] bg-[#e6f5ef] rounded-tl-[60px] lg:rounded-tl-[100px] -z-10 opacity-70"></div>
-      
-      <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-12 relative z-10 w-full">
-        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-4">
-          
-          {/* Left Content */}
-          <div className="flex-1 text-center lg:text-left max-w-xl xl:max-w-2xl mx-auto lg:mx-0 lg:pt-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e6f5ef] text-[#0b6d4b] text-[11px] sm:text-[12px] font-bold mb-4 sm:mb-6">
-              🏢 Smart Society Management Platform
-            </div>
+    <div className="relative w-full h-[100dvh] md:h-[600px] lg:h-[750px] bg-[#000000] overflow-hidden group">
+      {/* Slides Container */}
+      <div 
+        className="w-full h-full flex transition-transform duration-700 ease-in-out"
+        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+      >
+        {slides.map((slide, index) => (
+          <div key={slide.id} className="w-full h-full flex-shrink-0 relative flex flex-col justify-center">
+            <img 
+              src={slide.image} 
+              alt={slide.title1 + ' ' + slide.titleHighlight} 
+              className="absolute inset-0 w-full h-full object-cover object-[center_30%] z-0" 
+              fetchPriority={index === 0 ? "high" : "auto"}
+              decoding={index === 0 ? "sync" : "async"}
+            />
             
-            <h1 className="text-[28px] sm:text-4xl lg:text-[2.75rem] xl:text-[3.25rem] font-extrabold text-[#111827] leading-[1.2] tracking-tight mb-4 sm:mb-5">
-              <span className="block">The Complete Society Management Platform</span>
-              <span className="text-[#0b6d4b] block mt-1">for Apartments & Gated Communities</span>
-            </h1>
-            
-            <p className="text-[13px] sm:text-[15px] lg:text-[16px] text-gray-600 mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
-              Manage residents, visitors, maintenance, accounting, security, payments, amenities, communication, and daily operations from a single cloud-based platform. Available as a Web App, PWA, Android App, and iOS App.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-6 sm:mb-8 w-full sm:w-auto">
-              <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#0b6d4b] hover:bg-[#08593d] text-white px-6 sm:px-7 py-3.5 sm:py-3 rounded-full font-semibold transition-all shadow-lg shadow-[#0b6d4b]/20 text-[14px] sm:text-sm">
-                Request Free Demo
-              </button>
-              <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-[#111827] border border-gray-200 px-6 sm:px-7 py-3.5 sm:py-3 rounded-full font-semibold transition-all shadow-sm text-[14px] sm:text-sm">
-                Explore Features
-              </button>
-            </div>
-            
-            <div className="flex flex-col items-center lg:items-start gap-2 justify-center lg:justify-start text-sm font-semibold text-gray-700">
-               <div className="flex items-center gap-1.5 text-yellow-400 mb-0.5">
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <span className="text-xs text-gray-700 font-bold ml-1">Rated by Housing Societies</span>
-               </div>
-               <span className="text-[11px] sm:text-xs text-gray-500 font-medium max-w-[280px] sm:max-w-none text-center lg:text-left leading-relaxed">
-                 Trusted by Apartment Associations, Builders & Property Managers across India.
-               </span>
-            </div>
+            <div className="max-w-[85rem] w-full mx-auto px-5 sm:px-6 lg:px-8 relative z-20 h-full flex items-start md:items-center">
+              <div className="relative w-full md:w-[50%] lg:w-[45%] mt-0 md:-mt-16 pt-[90px] md:pt-0 pb-4 md:pb-12">
+                 <div className="flex items-center gap-2 mb-1.5">
+                   <div className="w-0.5 h-3" style={{ backgroundColor: slide.themeColor }}></div>
+                   <span className={`${slide.textColor} text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase ${slide.bgColorClass} px-2 py-1 rounded`}>
+                     {slide.tagline}
+                   </span>
+                 </div>
+                 
+                 <h1 className={`${slide.textColor} font-black leading-[1.1] mb-2 md:mb-4`}>
+                   <span className="block text-2xl md:text-4xl lg:text-6xl tracking-tight drop-shadow-md">{slide.title1}</span>
+                   <span className="block text-3xl md:text-5xl lg:text-7xl mt-0 md:mt-1 tracking-tighter" style={{ color: slide.themeColor, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                     {slide.titleHighlight}
+                   </span>
+                   {slide.title2 && <span className={slide.id === 3 ? "text-xl md:text-3xl lg:text-4xl drop-shadow-md mt-0 md:mt-1" : "drop-shadow-md text-sm md:text-base"}>{slide.title2}</span>}
+                 </h1>
+                 
+                 <div className={`text-[10px] md:text-sm font-bold tracking-widest uppercase mb-1 md:mb-2 opacity-90 text-blue-900`}>
+                   {slide.subtitle}
+                 </div>
+                 <p className={`hidden md:block font-medium text-xs md:text-sm leading-relaxed mb-6 max-w-sm md:max-w-md ${slide.pBgClass} p-2 rounded-lg text-blue-950 backdrop-blur-sm`}>
+                   {slide.description}
+                 </p>
 
-            {/* SEO Keywords - Visually Hidden for Google */}
-            <div className="sr-only">
-              Society Management Software, Apartment Management Software, Apartment Management App, Housing Society Management, Gated Community Management, Visitor Management System, Maintenance Billing Software, Resident Management, Society Accounting Software, Society Mobile App
-            </div>
-          </div>
-          
-          {/* Right Content - App Mockups */}
-          <div className="flex-1 relative w-full flex justify-center items-center h-[500px] lg:h-[650px] perspective-[1500px] lg:translate-x-12 mt-10 lg:mt-0 pb-10 lg:pb-0">
-            
-            {/* Desktop Dashboard (Back) */}
-            <div 
-              className="absolute right-0 lg:-right-2 top-[40%] -translate-y-1/2 w-[90%] max-w-[420px] lg:max-w-[480px] h-[400px] lg:h-[500px] bg-white rounded-3xl border border-gray-100 p-4 lg:p-6 z-0 hidden md:flex flex-col overflow-hidden"
-              style={{ 
-                transform: 'rotateY(-8deg) rotateX(2deg) translateZ(-80px) translateX(20px)', 
-                boxShadow: '-15px 15px 40px rgba(0,0,0,0.05), inset -1px -1px 0px rgba(0,0,0,0.02)'
-              }}
-            >
-               <div className="font-bold text-gray-800 text-lg mb-4">Dashboard</div>
-               
-               <div className="grid grid-cols-3 gap-3 mb-5">
-                 <div className="bg-gray-50/80 rounded-2xl p-3 border border-gray-100 shadow-sm">
-                   <div className="text-[10px] text-gray-500 font-semibold mb-1">Total Members</div>
-                   <div className="text-xl font-bold text-gray-900">248</div>
-                 </div>
-                 <div className="bg-gray-50/80 rounded-2xl p-3 border border-gray-100 shadow-sm">
-                   <div className="text-[10px] text-gray-500 font-semibold mb-1">Total Flats</div>
-                   <div className="text-xl font-bold text-gray-900">192</div>
-                 </div>
-                 <div className="bg-gray-50/80 rounded-2xl p-3 border border-gray-100 shadow-sm">
-                   <div className="text-[10px] text-gray-500 font-semibold mb-1">Pending Dues</div>
-                   <div className="text-lg font-bold text-gray-900">₹1,45,200</div>
-                 </div>
-               </div>
-
-               <div className="flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm p-3 relative flex flex-col mb-4">
-                  <div className="text-xs font-bold text-gray-800 mb-2">Monthly Collection</div>
-                  
-                  <div className="flex-1 relative w-full flex items-end justify-between px-2 pb-5">
-                    <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-                      <path d="M0,80 L20,70 L40,85 L60,50 L80,65 L100,40" fill="none" stroke="#0b6d4b" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-                      <circle cx="0" cy="80" r="3" fill="#0b6d4b" />
-                      <circle cx="20" cy="70" r="3" fill="#0b6d4b" />
-                      <circle cx="40" cy="85" r="3" fill="#0b6d4b" />
-                      <circle cx="60" cy="50" r="3" fill="#0b6d4b" />
-                      <circle cx="80" cy="65" r="3" fill="#0b6d4b" />
-                      <circle cx="100" cy="40" r="3" fill="#0b6d4b" />
-                    </svg>
-                    
-                    <div className="absolute left-[58%] top-[35%] bg-gray-900 text-white text-[9px] py-1 px-2 rounded shadow-lg whitespace-nowrap">
-                      May<br/><span className="font-bold">₹2,45,600</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between text-[9px] text-gray-400 font-bold px-2 pt-2 border-t border-gray-50">
-                     <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-                  </div>
-               </div>
-               
-               {/* Bottom Circle Chart Mock */}
-               <div className="h-28 flex gap-4">
-                  <div className="w-1/2 border border-gray-100 rounded-xl p-3 flex flex-col relative">
-                     <div className="text-[10px] font-bold text-gray-800 mb-1">Complaints</div>
-                     <div className="flex items-center gap-3">
-                       <div className="w-12 h-12 rounded-full border-4 border-t-[#0b6d4b] border-r-[#0b6d4b] border-b-yellow-400 border-l-blue-500 flex items-center justify-center text-[10px] font-bold">32</div>
-                       <div className="flex flex-col gap-1 text-[8px] font-semibold text-gray-500">
-                          <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#0b6d4b]"></span>Open</div>
-                          <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>In Progress</div>
-                          <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Resolved</div>
+                 <div className="flex flex-wrap gap-2 md:gap-4 lg:gap-8 mb-4 md:mb-8">
+                   {slide.features.map((feature, idx) => (
+                     <div key={idx} className="flex flex-col items-center gap-2 text-center">
+                       <div 
+                         className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors shadow-sm"
+                         style={{
+                           border: `1px solid ${slide.themeColor}`,
+                           backgroundColor: 'rgba(255,255,255,0.7)',
+                           color: slide.themeColor
+                         }}
+                       >
+                         <feature.icon className="w-4 h-4" strokeWidth={1.5} />
+                       </div>
+                       <div className={`text-blue-950 text-[8px] md:text-[10px] font-bold uppercase tracking-wider leading-tight max-w-[60px] md:max-w-[80px]`}>
+                         {feature.label}
                        </div>
                      </div>
-                  </div>
-               </div>
-            </div>
+                   ))}
+                 </div>
 
-            {/* Mobile Phone (Foreground) */}
-            <div 
-              className="relative md:absolute md:-left-2 lg:left-4 md:top-[45%] lg:top-[48%] md:-translate-y-1/2 z-20 w-[190px] sm:w-[210px] lg:w-[230px] bg-[#1a1a1a] rounded-[2rem] sm:rounded-[2.2rem] p-[6px] sm:p-[7px]"
-              style={{ 
-                transform: 'rotateY(-6deg) rotateX(1.5deg) translateZ(20px)',
-                boxShadow: '-15px 15px 30px rgba(0,0,0,0.15), inset -1px -1px 2px rgba(255,255,255,0.1)'
-              }}
-            >
-              {/* Phone Notch */}
-              <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 sm:w-14 h-3.5 bg-[#1a1a1a] rounded-b-xl z-30"></div>
-              
-              {/* Phone Screen Slider */}
-              <div className="w-full h-[390px] sm:h-[420px] lg:h-[460px] bg-white rounded-[1.6rem] sm:rounded-[1.8rem] overflow-hidden relative border border-gray-100">
-                
-                <div 
-                  className="w-full h-full flex transition-transform duration-500 ease-in-out bg-white"
-                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                >
-                  
-                  {/* Slide 0: Custom Dashboard UI */}
-                  <div className="w-full h-full flex-shrink-0 relative flex flex-col pt-7 px-3 pb-3 bg-white">
-                    {/* Header */}
-                    <div className="flex justify-between items-center mb-3">
-                      <div>
-                        <h3 className="font-bold text-gray-900 text-[9px] sm:text-[10px]">Green Valley Society</h3>
-                        <p className="text-[7px] sm:text-[8px] text-gray-500">Tower A</p>
-                      </div>
-                      <button className="w-5 h-5 flex items-center justify-center text-gray-800">
-                        <Bell className="w-3 h-3" />
-                      </button>
-                    </div>
-
-                    {/* Green Greeting Card */}
-                    <div className="bg-[#0b6d4b] rounded-xl p-2.5 text-white mb-4 relative overflow-hidden shadow-lg shadow-[#0b6d4b]/30 flex justify-between items-center">
-                      <div>
-                        <p className="text-[8px] sm:text-[9px] font-medium opacity-90 mb-0.5">Good Morning</p>
-                        <h2 className="text-[11px] sm:text-[12px] font-bold mb-0.5">Rajesh Mishra</h2>
-                        <p className="text-[6.5px] sm:text-[7.5px] opacity-80">Have a great day ahead!</p>
-                      </div>
-                      <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                        <Bell className="w-3 h-3 text-white" />
-                      </div>
-                    </div>
-
-                    {/* Quick Access */}
-                    <h4 className="font-bold text-gray-900 text-[9px] sm:text-[10px] mb-2">Quick Access</h4>
-                    <div className="grid grid-cols-4 gap-y-2.5 sm:gap-y-3 gap-x-1 mb-3">
-                      <div className="flex flex-col items-center justify-start gap-1 cursor-pointer">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-orange-50 border border-orange-100 text-orange-500 flex items-center justify-center shrink-0 shadow-sm"><Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
-                        <span className="text-[6.5px] font-bold text-gray-700 text-center w-full truncate">Notices</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-start gap-1 cursor-pointer">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-blue-50 border border-blue-100 text-blue-500 flex items-center justify-center shrink-0 shadow-sm"><Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
-                        <span className="text-[6.5px] font-bold text-gray-700 text-center w-full truncate">Visitors</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-start gap-1 cursor-pointer">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-pink-50 border border-pink-100 text-pink-500 flex items-center justify-center shrink-0 shadow-sm"><Wrench className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
-                        <span className="text-[6.5px] font-bold text-gray-700 text-center w-full truncate">Maint.</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-start gap-1 cursor-pointer">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-indigo-50 border border-indigo-100 text-indigo-500 flex items-center justify-center shrink-0 shadow-sm"><AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
-                        <span className="text-[6.5px] font-bold text-gray-700 text-center w-full truncate">Complaints</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-start gap-1 cursor-pointer">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-orange-50 border border-orange-100 text-orange-500 flex items-center justify-center shrink-0 shadow-sm"><FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
-                        <span className="text-[6.5px] font-bold text-gray-700 text-center w-full truncate">Bills</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-start gap-1 cursor-pointer">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-green-50 border border-green-100 text-green-500 flex items-center justify-center shrink-0 shadow-sm"><CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
-                        <span className="text-[6.5px] font-bold text-gray-700 text-center w-full truncate">Payments</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-start gap-1 cursor-pointer">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-blue-50 border border-blue-100 text-blue-500 flex items-center justify-center shrink-0 shadow-sm"><Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
-                        <span className="text-[6.5px] font-bold text-gray-700 text-center w-full truncate">Amenities</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-start gap-1 cursor-pointer">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-[10px] bg-orange-50 border border-orange-100 text-orange-500 flex items-center justify-center shrink-0 shadow-sm"><Grid className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></div>
-                        <span className="text-[6.5px] font-bold text-gray-700 text-center w-full truncate">More</span>
-                      </div>
-                    </div>
-                    
-                    {/* Latest Notice */}
-                    <h4 className="font-bold text-gray-900 text-[9px] sm:text-[10px] mb-1.5 mt-1.5">Latest Notice</h4>
-                    <div className="bg-gray-50 rounded-[10px] p-2 flex flex-col border border-gray-100 shadow-sm mb-2.5">
-                       <div className="flex justify-between items-center mb-0.5">
-                          <h5 className="text-[7.5px] sm:text-[8px] font-bold text-gray-800">Water Supply Maintenance</h5>
-                          <ChevronRight className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-gray-400" />
-                       </div>
-                       <p className="text-[6px] sm:text-[6.5px] text-gray-500 leading-relaxed mb-1">Water supply will be closed on<br/>15 May 2025 from 10:00 AM to 2:00 PM</p>
-                       <p className="text-[6px] sm:text-[6.5px] text-gray-400 font-semibold">May 12, 2025</p>
-                    </div>
-
-                    {/* Upcoming Events */}
-                    <h4 className="font-bold text-gray-900 text-[9px] sm:text-[10px] mb-1.5">Upcoming Events</h4>
-                    <div className="bg-white rounded-[10px] p-1.5 flex items-center gap-1.5 border border-gray-100 shadow-sm">
-                      <div className="w-5 h-5 rounded-md bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0"><Users className="w-2.5 h-2.5" /></div>
-                      <div className="flex-1 min-w-0">
-                        <h5 className="text-[7.5px] sm:text-[8px] font-bold text-gray-800 truncate">Society Meeting</h5>
-                        <p className="text-[6px] sm:text-[6.5px] text-gray-500 truncate">May 20, 2025 • 6:00 PM</p>
-                      </div>
-                      <ChevronRight className="w-2.5 h-2.5 text-gray-400 shrink-0" />
-                    </div>
-                  </div>
-
-                  {/* 14 Real Image Slides */}
-                  {slideImages.map((src, idx) => (
-                    <div key={idx} className="w-full h-full flex-shrink-0 relative bg-white flex items-center justify-center overflow-hidden">
-                      <img src={src} alt={`App Screen ${idx + 1}`} className="w-full h-full object-cover object-center scale-[1.25]" />
-                    </div>
-                  ))}
-
-                </div>
-
+                 <div className="flex flex-wrap gap-3 mt-2">
+                   <button 
+                     onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
+                     className={`flex items-center justify-center gap-2 px-4 py-2 md:px-6 md:py-2.5 rounded transition-colors font-bold tracking-widest text-[10px] md:text-xs uppercase shadow-md flex-1 md:flex-none ${slide.btnText} ${slide.btnHover}`}
+                     style={{ backgroundColor: slide.themeColor }}
+                   >
+                     ENQUIRE NOW <ArrowRight className="w-3 h-3 ml-1" />
+                   </button>
+                   <Link 
+                     to="/products"
+                     className={`flex items-center justify-center gap-2 border px-4 py-2 md:px-6 md:py-2.5 rounded transition-colors font-bold tracking-widest text-[10px] md:text-xs uppercase shadow-sm group flex-1 md:flex-none ${slide.btnBorderHover}`}
+                     style={{ 
+                       borderColor: slide.themeColor,
+                       color: '#0f172a'
+                     }}
+                   >
+                     EXPLORE PRODUCTS <ArrowRight className="w-3 h-3 ml-1" />
+                   </Link>
+                 </div>
               </div>
             </div>
-            
           </div>
-          
-        </div>
+        ))}
       </div>
-    </section>
+
+      {/* Slide Indicators & Navigation */}
+      <div className="absolute top-[30%] right-8 z-30 flex flex-col gap-4">
+        <button onClick={prevSlide} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all">
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <div className="flex flex-col items-center justify-center text-xs font-bold tracking-widest text-white/50 gap-1">
+          <span style={{ color: slides[currentSlide].themeColor }}>{(currentSlide + 1).toString().padStart(2, '0')}</span>
+          <span className="w-4 h-[1px] bg-white/20"></span>
+          <span>{totalSlides.toString().padStart(2, '0')}</span>
+        </div>
+        <button onClick={nextSlide} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all">
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
   );
 };
 

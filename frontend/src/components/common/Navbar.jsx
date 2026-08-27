@@ -1,40 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronDown, ChevronRight, ArrowRight, ShieldCheck, Users, MessageSquare, Wallet, Wrench, Building2, LayoutGrid, Home, Building, Menu, X } from 'lucide-react';
-import { navigation } from '../../data/navigation';
-
-const deptIcons = {
-  security: <ShieldCheck className="w-4 h-4" />,
-  residents: <Users className="w-4 h-4" />,
-  community: <MessageSquare className="w-4 h-4" />,
-  finance: <Wallet className="w-4 h-4" />,
-  maintenance: <Wrench className="w-4 h-4" />,
-  amenities: <Building2 className="w-4 h-4" />,
-  administration: <LayoutGrid className="w-4 h-4" />
-};
+import { ChevronDown, ChevronRight, Menu, X, FileText } from 'lucide-react';
+import { productsData } from '../../data/products';
+import apiClient from '../../api/client';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [megaOpen, setMegaOpen] = useState(false);
-  const [isPinned, setIsPinned] = useState(false);
-  const [industriesOpen, setIndustriesOpen] = useState(false);
-  const [isIndPinned, setIsIndPinned] = useState(false);
-  const [activeTab, setActiveTab] = useState(navigation.departments[0].id);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [mobileFeaturesOpen, setMobileFeaturesOpen] = useState(false);
-  const [mobileExpandedDept, setMobileExpandedDept] = useState(null);
+  const [openMobileDropdown, setOpenMobileDropdown] = useState(null);
   const location = useLocation();
-  const megaRef = useRef(null);
 
-  // Close menus on route change
   useEffect(() => {
-    setMegaOpen(false);
-    setIsPinned(false);
-    setIndustriesOpen(false);
-    setIsIndPinned(false);
     setIsMobileMenuOpen(false);
-    setMobileFeaturesOpen(false);
-    setMobileExpandedDept(null);
+    setOpenMobileDropdown(null);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -43,202 +21,243 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Click outside to close
+  const isHome = location.pathname === '/';
+  const isTransparent = isHome && !scrolled;
+
+  const [dbCategories, setDbCategories] = useState([]);
+  const [dbProducts, setDbProducts] = useState([]);
+
   useEffect(() => {
-    const handleClick = (e) => {
-      if (megaRef.current && !megaRef.current.contains(e.target)) {
-        setMegaOpen(false);
-        setIsPinned(false);
-        setIndustriesOpen(false);
-        setIsIndPinned(false);
+    const fetchData = async () => {
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          apiClient.get('/categories'),
+          apiClient.get('/products')
+        ]);
+        setDbCategories(catRes.data.filter(c => c.status === 'Active') || []);
+        setDbProducts(prodRes.data || []);
+      } catch (error) {
+        console.error('Error fetching dynamic navbar data:', error);
       }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    fetchData();
   }, []);
 
-  const activeDept = navigation.departments.find(d => d.id === activeTab);
+  const getProductsByCategory = (categoryId, isSpecial = false) => {
+    return dbProducts.filter(p => p.category?._id === categoryId && (isSpecial ? p.isSpecial : true));
+  };
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'About Us', path: '/about' },
+    { name: 'Products', path: '/products', hasDropdown: true },
+    { name: 'Special Product', path: '/special-product', hasDropdown: true },
+    { name: 'Certifications', path: '/images/certification.jpg', isExternal: true },
+    { name: 'Blog', path: '/blog' },
+    { name: 'Contact Us', path: '/contact' },
+  ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 py-3' : 'bg-white py-5'}`}>
-      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="flex justify-between items-center h-10">
-          
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${!isTransparent ? 'bg-white shadow-sm border-b border-gray-100 py-3' : 'bg-transparent pt-1 pb-2 md:py-5'}`}>
+      <div className="max-w-[100rem] mx-auto px-2 md:px-4 sm:px-6 lg:px-8 relative">
+        <div className="flex justify-between items-center min-h-[4rem]">
+
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#0b6d4b] rounded-lg flex flex-col items-center justify-center text-white p-1 shadow-md">
-              <div className="flex gap-0.5 items-end h-full">
-                <div className="w-1.5 h-[60%] bg-white rounded-t-sm"></div>
-                <div className="w-1.5 h-[100%] bg-white rounded-t-sm"></div>
-                <div className="w-1.5 h-[80%] bg-white rounded-t-sm"></div>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-xl text-gray-900 tracking-tight leading-none">
-                Society<span className="text-[#0b6d4b]">Pro</span>
-              </span>
-            </div>
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/images/logo.png" 
+              alt="ImageTech Industries" 
+              className={`h-14 md:h-16 w-auto object-contain transition-all ${isTransparent ? 'bg-white/90 p-2 rounded-xl' : ''}`}
+            />
           </Link>
 
-          {/* Nav Links */}
-          <div className="hidden md:flex items-center space-x-1" ref={megaRef}>
-            {/* Features Cascading Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => {
-                if (!isPinned) setMegaOpen(true);
-                if (!isPinned && industriesOpen) { setIndustriesOpen(false); setIsIndPinned(false); }
-              }}
-              onMouseLeave={() => !isPinned && setMegaOpen(false)}
-            >
-              <button 
-                onClick={() => {
-                  const newPinState = !isPinned;
-                  setIsPinned(newPinState);
-                  setMegaOpen(newPinState);
-                  if (newPinState) { setIndustriesOpen(false); setIsIndPinned(false); }
-                }}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-[14px] transition-colors ${megaOpen ? 'bg-gray-100 text-[#0b6d4b]' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
-              >
-                Features
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${megaOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {/* Primary Dropdown */}
-              {megaOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] py-2">
-                  {navigation.departments.map(dept => (
-                    <div key={dept.id} className="relative group">
-                      {/* Department Item */}
-                      <button className="w-full flex items-center justify-between px-5 py-3 text-[14.5px] font-bold text-gray-900 hover:bg-[#e6f5ef] hover:text-[#0b6d4b] transition-colors">
-                        <span className="flex items-center gap-3">
-                          <span className="text-[#0b6d4b] opacity-80">{deptIcons[dept.id]}</span>
-                          {dept.label}
-                        </span>
-                        <ChevronRight className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:-translate-x-1 transition-all" />
-                      </button>
-
-                      {/* Secondary Flyout Menu (Features) */}
-                      <div className="absolute top-0 left-full ml-1 w-72 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-x-2 group-hover:translate-x-0">
-                        <div className="px-5 py-2 mb-1 border-b border-gray-50">
-                          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{dept.label} Modules</span>
-                        </div>
-                        {dept.features.map(feat => (
-                          <Link
-                            key={feat.slug}
-                            to={`/features/${feat.slug}`}
-                            onClick={() => setMegaOpen(false)}
-                            className="flex items-center gap-2 px-5 py-2.5 text-[14px] font-semibold text-gray-900 hover:bg-[#e6f5ef] hover:text-[#0b6d4b] transition-colors"
-                          >
-                            <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
-                            {feat.name}
-                          </Link>
-                        ))}
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+            {navLinks.map((link, idx) => (
+              <div key={idx} className="relative group">
+                {link.isExternal ? (
+                  <a 
+                    href={link.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center gap-1 text-[15px] font-bold transition-colors ${isTransparent ? 'text-gray-900 hover:text-blue-700 drop-shadow-md' : 'text-[#1e293b] hover:text-blue-600'}`}
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link 
+                    to={link.path}
+                    className={`flex items-center gap-1 text-[15px] font-bold transition-colors ${isTransparent ? 'text-gray-900 hover:text-blue-700 drop-shadow-md' : 'text-[#1e293b] hover:text-blue-600'}`}
+                  >
+                    {link.name}
+                    {link.hasDropdown && <ChevronDown className="w-4 h-4" />}
+                  </Link>
+                )}
+                
+                {link.hasDropdown && link.name === 'Products' && (
+                  <div className="absolute top-full left-0 mt-4 w-64 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                    {dbCategories.map(category => {
+                      const categoryProds = getProductsByCategory(category._id);
+                      return (
+                      <div key={category._id} className="relative group/cat">
+                        <Link 
+                          to={`/products?category=${category.slug}`} 
+                          className="flex items-center justify-between px-5 py-3 text-[14px] font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        >
+                          {category.name}
+                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover/cat:text-blue-600" />
+                        </Link>
+                        
+                        {/* Secondary Flyout for Products */}
+                        {categoryProds.length > 0 && (
+                          <div className="absolute top-0 left-[100%] w-72 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover/cat:opacity-100 group-hover/cat:visible transition-all duration-200 ml-1">
+                            {categoryProds.map(p => (
+                              <Link 
+                                key={p._id}
+                                to={`/products/${p.slug}`} 
+                                className="block px-5 py-3 text-[13.5px] font-bold text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-6 transition-all"
+                              >
+                                {p.title}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    )})}
+                  </div>
+                )}
 
-            <Link to="/industries" className="px-4 py-2 text-[14px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-colors">Industries</Link>
-
-            {/* Standard Links */}
-            <Link to="/pricing" className="px-4 py-2 text-[14px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-colors">Pricing</Link>
-            <Link to="/about" className="px-4 py-2 text-[14px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-colors">About Us</Link>
-            <Link to="/contact" className="px-4 py-2 text-[14px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-colors">Contact</Link>
+                {link.hasDropdown && link.name === 'Special Product' && (
+                  <div className="absolute top-full left-0 mt-4 w-64 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                    {dbCategories.map(category => {
+                      const specialProds = getProductsByCategory(category._id, true);
+                      if (specialProds.length === 0) return null;
+                      return (
+                      <div key={category._id} className="relative group/cat">
+                        <Link 
+                          to={`/products?category=${category.slug}`} 
+                          className="flex items-center justify-between px-5 py-3 text-[14px] font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        >
+                          {category.name}
+                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover/cat:text-blue-600" />
+                        </Link>
+                        
+                        {/* Secondary Flyout for Products */}
+                        <div className="absolute top-0 left-[100%] w-72 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover/cat:opacity-100 group-hover/cat:visible transition-all duration-200 ml-1">
+                          {specialProds.map(p => (
+                            <Link 
+                              key={p._id}
+                              to={`/products/${p.slug}`} 
+                              className="block px-5 py-3 text-[13.5px] font-bold text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-6 transition-all"
+                            >
+                              {p.title}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )})}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           {/* Action Button */}
-          <div className="hidden md:flex items-center gap-4">
-            <Link to="/" className="text-[14px] font-bold text-gray-600 hover:text-gray-900">Sign in</Link>
-            <button className="bg-[#0b6d4b] hover:bg-[#09573c] text-white px-5 py-2.5 rounded-xl font-bold text-[14px] transition-all shadow-md shadow-[#0b6d4b]/20 hover:-translate-y-0.5">
-              Book a Demo
+          <div className="hidden md:flex items-center">
+            <button 
+              onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
+              className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white px-5 py-2.5 rounded font-bold text-[13px] flex items-center gap-2 transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              GET A QUOTE
             </button>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-900 hover:text-[#0b6d4b] p-2 focus:outline-none transition-colors"
+              className="p-2 focus:outline-none transition-colors text-gray-900"
             >
               {isMobileMenuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
             </button>
           </div>
-          
+
         </div>
       </div>
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] py-4 px-6 flex flex-col gap-5 max-h-[85vh] overflow-y-auto">
-          
-          {/* Features Accordion */}
-          <div className="flex flex-col">
-            <button 
-              onClick={() => setMobileFeaturesOpen(!mobileFeaturesOpen)}
-              className="w-full font-bold text-gray-800 text-lg flex justify-between items-center transition-colors"
-            >
-              Features <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${mobileFeaturesOpen ? 'rotate-180' : ''}`} />
-            </button>
-            
-            {/* Departments List */}
-            {mobileFeaturesOpen && (
-              <div className="pl-3 mt-3 flex flex-col gap-3">
-                {navigation.departments.map(dept => (
-                  <div key={dept.id} className="flex flex-col border-l-2 border-gray-100 pl-3">
-                    <button 
-                      onClick={() => setMobileExpandedDept(mobileExpandedDept === dept.id ? null : dept.id)}
-                      className="flex justify-between items-center py-1.5 text-gray-800 font-bold text-[15px]"
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-lg py-4 px-6 flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
+           {navLinks.map((link, idx) => (
+              <div key={idx} className="flex flex-col">
+                {link.isExternal ? (
+                  <a href={link.path} target="_blank" rel="noopener noreferrer" className="font-bold text-gray-800 text-lg flex justify-between items-center py-2">
+                    {link.name}
+                  </a>
+                ) : (
+                  <div className="flex flex-col">
+                    <div 
+                      onClick={(e) => {
+                        if (link.hasDropdown) {
+                          e.preventDefault();
+                          setOpenMobileDropdown(openMobileDropdown === link.name ? null : link.name);
+                        }
+                      }}
+                      className="flex justify-between items-center py-2 cursor-pointer group"
                     >
-                      <span className="flex items-center gap-2.5">
-                        <span className="text-[#0b6d4b]">{deptIcons[dept.id]}</span>
-                        {dept.label}
-                      </span>
-                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${mobileExpandedDept === dept.id ? 'rotate-180' : ''}`} />
-                    </button>
+                      {link.hasDropdown ? (
+                        <span className="font-bold text-gray-800 text-lg group-hover:text-blue-600 transition-colors">{link.name}</span>
+                      ) : (
+                        <Link to={link.path} className="font-bold text-gray-800 text-lg w-full hover:text-blue-600 transition-colors">{link.name}</Link>
+                      )}
+                      {link.hasDropdown && (
+                        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${openMobileDropdown === link.name ? 'rotate-180' : ''}`} />
+                      )}
+                    </div>
                     
-                    {/* Features List */}
-                    {mobileExpandedDept === dept.id && (
-                      <div className="pl-6 pt-2 pb-1 flex flex-col gap-3">
-                        {dept.features.map(feat => (
-                          <Link 
-                            key={feat.slug} 
-                            to={`/features/${feat.slug}`}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-gray-600 hover:text-[#0b6d4b] text-[14px] font-semibold flex items-center gap-2"
-                          >
-                            <div className="w-1 h-1 rounded-full bg-gray-400"></div>
-                            {feat.name}
-                          </Link>
-                        ))}
+                    {/* Render accordion content if this dropdown is open */}
+                    {link.hasDropdown && openMobileDropdown === link.name && (
+                      <div className="flex flex-col pl-4 gap-4 py-3 border-l-2 border-gray-100 ml-2 mt-1">
+                        <Link to={link.path} className="text-[15px] font-bold text-blue-600">
+                          View All {link.name} →
+                        </Link>
+                        {dbCategories.map(category => {
+                          const categoryProds = getProductsByCategory(category._id, link.name === 'Special Product');
+                          if (link.name === 'Special Product' && categoryProds.length === 0) return null;
+                          if (link.name === 'Products' && categoryProds.length === 0) return null;
+                          return (
+                            <div key={category._id} className="flex flex-col gap-2">
+                              <Link to={`/products?category=${category.slug}`} className="font-bold text-[14px] text-gray-800 hover:text-blue-600">
+                                {category.name}
+                              </Link>
+                              <div className="flex flex-col pl-3 gap-2.5 mt-1 border-l border-gray-100">
+                                {categoryProds.map(p => (
+                                  <Link 
+                                    key={p._id} 
+                                    to={`/products/${p.slug}`} 
+                                    className="text-[13.5px] font-medium text-gray-500 hover:text-blue-600 pl-2"
+                                  >
+                                    {p.title}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
-
-          <Link to="/industries" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-800 text-lg flex justify-between items-center">
-            Industries <ChevronRight className="w-5 h-5 text-gray-400" />
-          </Link>
-          <Link to="/pricing" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-800 text-lg flex justify-between items-center">
-            Pricing <ChevronRight className="w-5 h-5 text-gray-400" />
-          </Link>
-          <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-800 text-lg flex justify-between items-center">
-            About Us <ChevronRight className="w-5 h-5 text-gray-400" />
-          </Link>
-          <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-800 text-lg flex justify-between items-center">
-            Contact <ChevronRight className="w-5 h-5 text-gray-400" />
-          </Link>
-          <hr className="border-gray-100 my-1" />
-          <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="font-bold text-gray-600 text-lg text-center py-2">
-            Sign in
-          </Link>
-          <button className="bg-[#0b6d4b] text-white px-5 py-3.5 rounded-xl font-bold text-[16px] shadow-md shadow-[#0b6d4b]/20 w-full text-center">
-            Book a Demo
+           ))}
+          <hr className="border-gray-100 my-2" />
+          <button 
+            onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
+            className="bg-[#1e3a8a] text-white px-5 py-3.5 rounded font-bold text-[16px] w-full text-center flex items-center justify-center gap-2"
+          >
+            <FileText className="w-5 h-5" />
+            GET A QUOTE
           </button>
         </div>
       )}

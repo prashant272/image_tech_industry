@@ -1,28 +1,29 @@
 import React from 'react';
 import Hero from '../components/home/Hero';
-import BuiltFor from '../components/home/BuiltFor';
-import Comparison from '../components/home/Comparison';
-import DashboardShowcase from '../components/home/DashboardShowcase';
-import Features from '../components/home/Features';
-import HowItWorks from '../components/home/HowItWorks';
-import CrossPlatform from '../components/home/CrossPlatform';
-import TrustStats from '../components/home/TrustStats';
+import StatsBanner from '../components/home/StatsBanner';
+import AboutPreview from '../components/home/AboutPreview';
+
 import WhyChooseUs from '../components/home/WhyChooseUs';
+import OurProducts from '../components/home/OurProducts';
+import Industries from '../components/home/Industries';
+import Blogs from '../components/home/Blogs';
+import Testimonials from '../components/home/Testimonials';
+import FAQ from '../components/home/FAQ';
 import CTA from '../components/home/CTA';
 
 const Home = () => {
   return (
     <main className="flex-1 w-full flex flex-col">
       <Hero />
-      <BuiltFor />
-      <DashboardShowcase />
-      <Comparison />
-      <Features />
-      <HowItWorks />
-      <CrossPlatform />
-      <TrustStats />
+      <StatsBanner />
+      <AboutPreview />
       <WhyChooseUs />
+      <OurProducts />
+      <Industries />
+      <Blogs />
+      <Testimonials />
       <CTA />
+      <FAQ />
     </main>
   );
 };

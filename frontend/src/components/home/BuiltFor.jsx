@@ -36,7 +36,7 @@ const BuiltFor = () => {
   ];
 
   return (
-    <section className="py-12 lg:py-16 bg-white relative z-20 overflow-hidden border-b border-gray-100">
+    <section className="py-6 lg:py-8 bg-white relative z-20 overflow-hidden border-b border-gray-100">
       <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Premium Header */}

@@ -236,12 +236,12 @@ const DashboardDetailShowcase = ({ dashboardId }) => {
                 {/* Image Showcase */}
                 <div className="lg:w-1/2 relative">
                   <div className="relative bg-white rounded-3xl p-4 shadow-xl border border-gray-100 z-10 w-full sm:w-4/5 mx-auto lg:mr-auto lg:ml-0 overflow-hidden">
-                     <img src={feat.webImg} alt={feat.title} className="w-full h-auto rounded-xl shadow-sm" />
+                     <img src={feat.webImg} alt={feat.title} loading="lazy" decoding="async" className="w-full h-auto rounded-xl shadow-sm" />
                   </div>
                   <div className="absolute -bottom-10 -right-4 sm:-right-10 z-20 w-[120px] sm:w-[160px] bg-white rounded-[2rem] p-1.5 border-2 sm:border-4 border-gray-300 shadow-2xl">
                      <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-2 bg-gray-300 rounded-b-lg z-30"></div>
                      <div className="w-full bg-black rounded-[1.5rem] overflow-hidden flex items-start justify-center">
-                       <img src={feat.phImg} alt={`${feat.title} Mobile`} className="w-full h-auto" />
+                       <img src={feat.phImg} alt={`${feat.title} Mobile`} loading="lazy" decoding="async" className="w-full h-auto" />
                      </div>
                   </div>
                 </div>
