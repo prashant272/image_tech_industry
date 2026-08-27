@@ -13,7 +13,7 @@ const slides = [
     subtitle: 'PREMIUM DOCTORING. FLAWLESS PRINTING.',
     description: 'High-quality Carbon Steel, Stainless Steel, and Polymer doctor blades. Engineered for precise wiping and extended cylinder life in Rotogravure & Flexographic printing.',
     themeColor: '#f97316',
-    textColor: 'text-white',
+    textColor: 'text-black',
     bgColorClass: 'bg-orange-600',
     pBgClass: 'bg-white/40',
     btnText: 'text-white',
@@ -37,7 +37,7 @@ const slides = [
     subtitle: 'HANDHELD & U-TUBE MODELS. PRECISION INSPECTION.',
     description: 'Advanced stroboscope solutions for high-speed motion analysis, quality control and industrial inspection applications.',
     themeColor: '#f97316',
-    textColor: 'text-white',
+    textColor: 'text-black',
     bgColorClass: 'bg-orange-600',
     pBgClass: 'bg-white/40',
     btnText: 'text-white',
@@ -60,7 +60,7 @@ const slides = [
     subtitle: 'ACCURATE SURFACE TESTING. RELIABLE RESULTS.',
     description: 'Dyne Test Pens ensure precise measurement of surface tension for inks, coatings and treatments. Consistent performance you can trust, every time.',
     themeColor: '#f97316',
-    textColor: 'text-white',
+    textColor: 'text-black',
     bgColorClass: 'bg-orange-600',
     pBgClass: 'bg-white/40',
     btnText: 'text-white',
@@ -84,7 +84,7 @@ const slides = [
     subtitle: 'CONSISTENT COATING. PERFECT RESULTS.',
     description: 'High-precision wire wound bar coaters for uniform and accurate coating thickness in laboratories and production environments.',
     themeColor: '#f97316',
-    textColor: 'text-white',
+    textColor: 'text-black',
     bgColorClass: 'bg-orange-600',
     pBgClass: 'bg-white/40',
     btnText: 'text-white',
@@ -107,7 +107,7 @@ const slides = [
     subtitle: 'PRECISE MEASUREMENT. OPTIMAL FLOW.',
     description: 'High-quality B4 Viscosity Cups for accurate measurement of ink and fluid viscosity. Ensure consistent quality in every batch.',
     themeColor: '#f97316',
-    textColor: 'text-white',
+    textColor: 'text-black',
     bgColorClass: 'bg-orange-600',
     pBgClass: 'bg-white/40',
     btnText: 'text-white',
@@ -159,7 +159,7 @@ const Hero = () => {
               <div className="relative w-full md:w-[50%] lg:w-[45%] bg-white/10 md:bg-transparent backdrop-blur-none p-6 sm:p-8 md:p-0 rounded-[2rem] md:rounded-none shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] md:shadow-none border border-white/40 md:border-none mt-8 md:mt-0 flex flex-col">
                  <div className="flex items-center gap-2 mb-2 md:mb-1.5">
                    <div className="w-0.5 h-3 md:h-4" style={{ backgroundColor: slide.themeColor }}></div>
-                   <span className={`${slide.textColor} text-xs md:text-sm font-bold tracking-[0.2em] uppercase ${slide.bgColorClass} px-2 py-1 rounded`}>
+                   <span className={`text-white text-xs md:text-sm font-bold tracking-[0.2em] uppercase ${slide.bgColorClass} px-2 py-1 rounded`}>
                      {slide.tagline}
                    </span>
                  </div>
@@ -223,20 +223,6 @@ const Hero = () => {
         ))}
       </div>
 
-      {/* Slide Indicators & Navigation */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 md:bottom-auto md:top-[50%] md:-translate-y-1/2 md:left-auto md:right-8 z-30 flex flex-row md:flex-col items-center gap-3 md:gap-4 w-full justify-center md:w-auto px-4 md:px-0">
-        <button onClick={prevSlide} className="w-10 h-10 rounded-full bg-black/40 md:bg-white/5 border border-white/20 md:border-white/10 flex items-center justify-center text-white md:text-white/50 hover:text-white hover:bg-black/60 transition-all backdrop-blur-sm shadow-lg">
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <div className="flex flex-row md:flex-col items-center justify-center text-xs font-bold tracking-widest text-white md:text-white/50 gap-2 md:gap-1 bg-black/40 md:bg-transparent px-4 py-2 md:px-0 md:py-0 rounded-full backdrop-blur-sm md:backdrop-blur-none shadow-lg md:shadow-none">
-          <span style={{ color: slides[currentSlide].themeColor }} className="drop-shadow-md md:drop-shadow-none">{(currentSlide + 1).toString().padStart(2, '0')}</span>
-          <span className="w-4 h-[1px] bg-white/50 md:bg-white/20"></span>
-          <span>{totalSlides.toString().padStart(2, '0')}</span>
-        </div>
-        <button onClick={nextSlide} className="w-10 h-10 rounded-full bg-black/40 md:bg-white/5 border border-white/20 md:border-white/10 flex items-center justify-center text-white md:text-white/50 hover:text-white hover:bg-black/60 transition-all backdrop-blur-sm shadow-lg">
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
     </div>
   );
 };

@@ -66,22 +66,22 @@ export default function QuoteModal() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
                 <label className="text-[12px] font-black text-gray-700 uppercase tracking-widest ml-1">Full Name</label>
-                <input required type="text" name="name" value={formData.name} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="John Doe" />
+                <input required type="text" name="name" value={formData.name} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="Full Name" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[12px] font-black text-gray-700 uppercase tracking-widest ml-1">Company Name</label>
-                <input required type="text" name="company" value={formData.company} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="Acme Packaging Corp" />
+                <input required type="text" name="company" value={formData.company} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="Company Name" />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
                 <label className="text-[12px] font-black text-gray-700 uppercase tracking-widest ml-1">Email Address</label>
-                <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="john@example.com" />
+                <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="Email Address" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[12px] font-black text-gray-700 uppercase tracking-widest ml-1">Phone Number</label>
-                <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="+91 98765 43210" />
+                <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="Phone Number" />
               </div>
             </div>
 
