@@ -15,7 +15,8 @@ const ProductManagement = () => {
     title: '', slug: '', category: '', isSpecial: false, shortDesc: '', longDesc: '',
     images: [''], features: [''], infoBoxes: [{ title: '', value: '', icon: '' }],
     overviewFeatures: [{ title: '', desc: '', icon: '' }], overviewText: [''],
-    faqs: [{ question: '', answer: '' }], specifications: [{ label: '', value: '' }]
+    faqs: [{ question: '', answer: '' }], specifications: [{ label: '', value: '' }],
+    seoTitle: '', seoDescription: '', seoKeywords: ''
   };
   const [formData, setFormData] = useState(initialFormState);
 
@@ -126,7 +127,10 @@ const ProductManagement = () => {
       overviewFeatures: product.overviewFeatures?.length ? product.overviewFeatures : [{ title: '', desc: '', icon: '' }],
       overviewText: product.overviewText?.length ? product.overviewText : [''],
       faqs: product.faqs?.length ? product.faqs : [{ question: '', answer: '' }],
-      specifications: product.specifications?.length ? product.specifications : [{ label: '', value: '' }]
+      specifications: product.specifications?.length ? product.specifications : [{ label: '', value: '' }],
+      seoTitle: product.seoTitle || '',
+      seoDescription: product.seoDescription || '',
+      seoKeywords: product.seoKeywords || ''
     });
     setEditingId(product._id);
     setShowModal(true);
@@ -347,8 +351,28 @@ const ProductManagement = () => {
                   </div>
                 ))}
               </div>
+              {/* SEO Information */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-gray-800 border-b pb-2">SEO Configuration</h4>
+                <div className="grid grid-cols-1 gap-4 bg-gray-50 p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+                    <input type="text" value={formData.seoTitle} onChange={(e) => setFormData({...formData, seoTitle: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Optimal length: 50-60 characters" />
+                    <p className="text-[11px] text-gray-500 mt-1">Leave blank to use the product Title.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
+                    <input type="text" value={formData.seoKeywords} onChange={(e) => setFormData({...formData, seoKeywords: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="e.g. doctor blades, flexo printing, carbon steel" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+                    <textarea value={formData.seoDescription} onChange={(e) => setFormData({...formData, seoDescription: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg" rows="3" placeholder="Optimal length: 150-160 characters"></textarea>
+                    <p className="text-[11px] text-gray-500 mt-1">Leave blank to use the Short Description.</p>
+                  </div>
+                </div>
               </div>
-              
+
+              </div>
               <div className="p-4 flex justify-end space-x-3 bg-white border-t shrink-0">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
                 <button type="submit" className="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md">

@@ -6,10 +6,11 @@ import sharp from 'sharp';
 
 // Configure S3 Client
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: 'auto',
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.R2_ACCESS_KEY_ID,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
   },
 });
 
@@ -45,7 +46,7 @@ export const uploadToS3 = async (req, res) => {
     }
 
     const params = {
-      Bucket: process.env.AWS_S3_BUCKET,
+      Bucket: process.env.R2_BUCKET_NAME,
       Key: `products/${fileName}`,
       Body: processedBuffer,
       ContentType: mimeType,
@@ -54,7 +55,7 @@ export const uploadToS3 = async (req, res) => {
     const command = new PutObjectCommand(params);
     await s3Client.send(command);
 
-    const fileUrl = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/products/${fileName}`;
+    const fileUrl = `${process.env.R2_PUBLIC_URL}/products/${fileName}`;
 
     res.status(200).json({ url: fileUrl, message: 'Upload successful' });
   } catch (error) {

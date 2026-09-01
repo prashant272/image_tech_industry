@@ -35,7 +35,10 @@ const productSchema = new mongoose.Schema({
   overviewFeatures: [overviewFeatureSchema],
   overviewText: [{ type: String }],
   faqs: [faqSchema],
-  specifications: [specificationSchema]
+  specifications: [specificationSchema],
+  seoTitle: { type: String },
+  seoDescription: { type: String },
+  seoKeywords: { type: String }
 }, { timestamps: true });
 
 export default mongoose.model('Product', productSchema);

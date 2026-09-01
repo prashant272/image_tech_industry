@@ -144,22 +144,24 @@ export default function ProductPreview({ product, categories }) {
 
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             {activeTab === 'overview' && (
-              <div className="flex flex-col xl:flex-row gap-8">
-                <div className="w-full xl:w-1/2">
+              <div className="flex flex-col gap-12">
+                <div className="w-full">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Product Overview</h3>
                   <div className="space-y-3 mb-6">
                     {product.longDesc ? (
-                      <p className="text-[13px] font-medium text-gray-700 leading-relaxed whitespace-pre-line">
-                        {product.longDesc}
-                      </p>
+                      <div 
+                        className="prose prose-sm max-w-none text-gray-700 prose-headings:font-bold prose-h2:text-xl prose-h2:mb-3 prose-h3:text-lg prose-h3:mb-2 prose-p:mb-4 prose-ul:list-disc prose-ul:pl-5 prose-li:mb-1"
+                        dangerouslySetInnerHTML={{ __html: product.longDesc }}
+                      />
                     ) : (
                       <p className="text-[13px] text-gray-400 italic">Long description will appear here in the overview...</p>
                     )}
                   </div>
                 </div>
                 
-                <div className="w-full xl:w-1/2">
-                  <div className="grid grid-cols-1 gap-4">
+                <div className="w-full">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Key Features</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {product.overviewFeatures.map((feat, idx) => (
                       <div key={idx} className="flex gap-3">
                         <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
