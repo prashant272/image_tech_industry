@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/sitemap.xml",
+      "destination": "https://api.imagetechindustries.com/api/sitemap.xml"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
