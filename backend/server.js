@@ -11,6 +11,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from './routes/uploadRoutes.js';
 import blogCategoryRoutes from './routes/blogCategoryRoutes.js';
+import sitemapRoutes from './routes/sitemapRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -31,6 +32,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/blog-categories", blogCategoryRoutes);
 app.use("/api/products", productRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/sitemap.xml', sitemapRoutes);
 
 console.log('✅ Routes mounted: /api/contact, /api/admin, /api/blogs, /api/enquiry, /api/facebook, /api/categories, /api/products');
 
