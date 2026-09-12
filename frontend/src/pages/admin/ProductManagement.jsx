@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, X, Eye } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, X, Eye, Copy } from 'lucide-react';
 import apiClient from '../../api/client';
 import ProductPreview from '../../components/admin/ProductPreview';
 
@@ -136,6 +136,29 @@ const ProductManagement = () => {
     setShowModal(true);
   };
 
+  const handleDuplicate = (product) => {
+    setFormData({
+      title: `${product.title || ''} (Copy)`,
+      slug: `${product.slug || ''}-copy`,
+      category: product.category?._id || '',
+      isSpecial: product.isSpecial || false,
+      shortDesc: product.shortDesc || '',
+      longDesc: product.longDesc || '',
+      images: product.images?.length ? product.images : [''],
+      features: product.features?.length ? product.features : [''],
+      infoBoxes: product.infoBoxes?.length ? product.infoBoxes : [{ title: '', value: '', icon: '' }],
+      overviewFeatures: product.overviewFeatures?.length ? product.overviewFeatures : [{ title: '', desc: '', icon: '' }],
+      overviewText: product.overviewText?.length ? product.overviewText : [''],
+      faqs: product.faqs?.length ? product.faqs : [{ question: '', answer: '' }],
+      specifications: product.specifications?.length ? product.specifications : [{ label: '', value: '' }],
+      seoTitle: product.seoTitle || '',
+      seoDescription: product.seoDescription || '',
+      seoKeywords: product.seoKeywords || ''
+    });
+    setEditingId(null);
+    setShowModal(true);
+  };
+
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
@@ -201,8 +224,9 @@ const ProductManagement = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button onClick={() => handleEdit(product)} className="text-indigo-600 hover:text-indigo-900 mx-2 p-1 rounded-md hover:bg-indigo-50"><Edit2 className="w-5 h-5" /></button>
-                  <button onClick={() => handleDelete(product._id)} className="text-red-600 hover:text-red-900 mx-2 p-1 rounded-md hover:bg-red-50"><Trash2 className="w-5 h-5" /></button>
+                  <button onClick={() => handleDuplicate(product)} className="text-green-600 hover:text-green-900 mx-1 p-1 rounded-md hover:bg-green-50" title="Duplicate"><Copy className="w-5 h-5" /></button>
+                  <button onClick={() => handleEdit(product)} className="text-indigo-600 hover:text-indigo-900 mx-1 p-1 rounded-md hover:bg-indigo-50" title="Edit"><Edit2 className="w-5 h-5" /></button>
+                  <button onClick={() => handleDelete(product._id)} className="text-red-600 hover:text-red-900 mx-1 p-1 rounded-md hover:bg-red-50" title="Delete"><Trash2 className="w-5 h-5" /></button>
                 </td>
               </tr>
             ))}

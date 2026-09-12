@@ -122,7 +122,7 @@ export default function ProductDetail() {
             </div>
             {/* Main Image */}
             <div
-              className="w-full aspect-square md:aspect-auto md:flex-grow rounded-2xl overflow-hidden bg-white border border-gray-200 relative cursor-zoom-in"
+              className="w-full aspect-square rounded-2xl overflow-hidden bg-white border border-gray-200 relative cursor-zoom-in flex items-center justify-center"
               onMouseEnter={() => setIsZooming(true)}
               onMouseLeave={() => setIsZooming(false)}
               onMouseMove={handleMouseMove}
@@ -130,7 +130,7 @@ export default function ProductDetail() {
               <img
                 src={product.images[activeImage]}
                 alt={product.title}
-                className={`w-full h-full object-contain md:object-fill transition-transform duration-200 ease-out`}
+                className={`w-full h-full object-contain transition-transform duration-200 ease-out`}
                 style={{
                   transform: isZooming ? 'scale(2.5)' : 'scale(1)',
                   transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
