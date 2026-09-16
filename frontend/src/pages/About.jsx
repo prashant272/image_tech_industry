@@ -5,8 +5,11 @@ import {
   FileText, Repeat, Flashlight, Ruler, Activity, Droplet, Box,
   CheckCircle2, Eye, Target, Trophy, Handshake, Check
 } from 'lucide-react';
+import { useLocationContext } from '../context/LocationContext';
 
 export default function About() {
+  const { cityName } = useLocationContext();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -79,7 +82,7 @@ export default function About() {
             </p>
             
             <p className="text-gray-700 font-medium text-[16px] leading-relaxed mb-6">
-              ImageTech Industries is a Delhi-based manufacturing powerhouse dedicated to delivering reliable, innovative, and high-performance industrial solutions.
+              ImageTech Industries is a {cityName}-based manufacturing powerhouse dedicated to delivering reliable, innovative, and high-performance industrial solutions.
             </p>
             <p className="text-gray-700 font-medium text-[16px] leading-relaxed mb-12">
               With a strong foundation built over decades of engineering excellence, we design precision products that maximize productivity and accuracy.

@@ -228,13 +228,13 @@ export default function Products() {
                 <div key={idx} className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-[#1e3a8a]/40 transition-all duration-300 group ${viewMode === 'list' ? 'flex items-center gap-4' : 'flex flex-col'}`}>
                   
                   {/* Image Container */}
-                  <div className={`relative bg-gray-50 border-b border-gray-200 ${viewMode === 'list' ? 'w-48 h-48 shrink-0' : 'w-full h-36 sm:h-44'}`}>
+                  <div className={`relative bg-gray-50 border-b border-gray-200 flex items-center justify-center p-1 sm:p-2 ${viewMode === 'list' ? 'w-48 h-48 shrink-0' : 'w-full h-56 sm:h-64'}`}>
                     <img 
                       src={product.image} 
                       alt={product.title} 
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                          e.target.onerror = null; 
                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjVmOSIgLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5NDkzYjgiIGR5PSIuM2VtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4='; // Simple gray SVG placeholder fallback

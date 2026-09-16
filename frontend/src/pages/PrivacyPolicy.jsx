@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
+import { useLocationContext } from '../context/LocationContext';
 
 const PrivacyPolicy = () => {
+  const { cityName } = useLocationContext();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -56,7 +58,7 @@ const PrivacyPolicy = () => {
           <address className="not-italic bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700">
             <strong>ImageTech Industries</strong><br />
             RZ-I-13, 2nd Floor, Nanda Block<br />
-            Mahavir Enclave, Delhi-110045, India<br />
+            Mahavir Enclave, {cityName}-110045, India<br />
             Phone: +91 8448336036
           </address>
         </div>

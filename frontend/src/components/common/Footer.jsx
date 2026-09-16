@@ -2,8 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, ChevronRight, Award, Settings, Headset, Globe } from 'lucide-react';
 import apiClient from '../../api/client';
+import { useLocationContext } from '../../context/LocationContext';
 
 const Footer = () => {
+  const { cityName, citySlug, isLocationRoute } = useLocationContext();
+
+  const getPath = (basePath) => {
+    if (!isLocationRoute) return basePath;
+    if (basePath === '/') return `/${citySlug}`;
+    return `/${citySlug}${basePath}`;
+  };
+
   const quickLinks = [
     { label: 'Home', url: '/' },
     { label: 'About Us', url: '/about' },
@@ -11,7 +20,6 @@ const Footer = () => {
     { label: 'Blogs', url: '/blog' },
     { label: 'Gallery', url: '/gallery' },
     { label: 'Sitemap', url: '/sitemap' },
-    { label: 'Our Presence', url: '/market-area' },
     { label: 'Contact Us', url: '/contact' },
   ];
 
@@ -76,7 +84,7 @@ const Footer = () => {
             <ul className="space-y-2">
               {quickLinks.map((link, index) => (
                 <li key={index}>
-                  <Link to={link.url} className="text-black font-bold text-[14px] hover:text-blue-600 transition-colors flex items-center gap-2 group">
+                  <Link to={getPath(link.url)} className="text-black font-bold text-[14px] hover:text-blue-600 transition-colors flex items-center gap-2 group">
                     <ChevronRight className="w-4 h-4 text-blue-600" />
                     {link.label}
                   </Link>
@@ -95,7 +103,7 @@ const Footer = () => {
               {products.length > 0 ? (
                 products.map((product) => (
                   <li key={product._id}>
-                    <Link to={`/products/${product.slug}`} className="text-black font-bold text-[14px] hover:text-blue-600 transition-colors flex items-center gap-2 group leading-snug">
+                    <Link to={getPath(`/products/${product.slug}`)} className="text-black font-bold text-[14px] hover:text-blue-600 transition-colors flex items-center gap-2 group leading-snug">
                       <ChevronRight className="w-4 h-4 text-blue-600 shrink-0" />
                       <span className="line-clamp-2">{product.title}</span>
                     </Link>
@@ -149,7 +157,7 @@ const Footer = () => {
                 </div>
                 <div className="pt-1">
                   <p className="text-black font-bold text-[13px] leading-relaxed pr-2 uppercase">
-                    RZ-I-13, 2ND FLOOR, NANDA BLOCK, MAHAVIR ENCLAVE, DELHI-110045, INDIA.
+                    RZ-I-13, 2ND FLOOR, NANDA BLOCK, MAHAVIR ENCLAVE, {cityName.toUpperCase()}-110045, INDIA.
                   </p>
                 </div>
               </div>
@@ -211,9 +219,9 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} ImageTech Industries. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <Link to="/privacy-policy" className="text-black font-bold text-[13px] hover:text-blue-600 transition-colors">Privacy Policy</Link>
-            <Link to="/terms-conditions" className="text-black font-bold text-[13px] hover:text-blue-600 transition-colors">Terms & Conditions</Link>
-            <Link to="/shipping-policy" className="text-black font-bold text-[13px] hover:text-blue-600 transition-colors">Shipping Policy</Link>
+            <Link to={getPath('/privacy-policy')} className="text-black font-bold text-[13px] hover:text-blue-600 transition-colors">Privacy Policy</Link>
+            <Link to={getPath('/terms-conditions')} className="text-black font-bold text-[13px] hover:text-blue-600 transition-colors">Terms & Conditions</Link>
+            <Link to={getPath('/shipping-policy')} className="text-black font-bold text-[13px] hover:text-blue-600 transition-colors">Shipping Policy</Link>
           </div>
         </div>
 

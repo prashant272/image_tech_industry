@@ -1,5 +1,6 @@
 import Product from '../models/Product.js';
 import Blog from '../models/Blog.js';
+import Location from '../models/Location.js';
 
 export const generateSitemap = async (req, res) => {
   try {
@@ -19,6 +20,7 @@ export const generateSitemap = async (req, res) => {
     // Fetch dynamic content
     const products = await Product.find({}, 'slug updatedAt');
     const blogs = await Blog.find({ status: 'Published' }, 'slug updatedAt');
+    const locations = await Location.find({ status: 'Active' }, 'slug');
 
     // Generate XML
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -36,6 +38,7 @@ export const generateSitemap = async (req, res) => {
 
     // Add Product URLs
     products.forEach((product) => {
+      // Base Product URL
       sitemap += `
   <url>
     <loc>${baseUrl}/products/${product.slug}</loc>
@@ -43,6 +46,17 @@ export const generateSitemap = async (req, res) => {
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>`;
+
+      // pSEO Product-in-Location URLs
+      locations.forEach((location) => {
+        sitemap += `
+  <url>
+    <loc>${baseUrl}/products/${product.slug}-in-${location.slug}</loc>
+    <lastmod>${product.updatedAt.toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+      });
     });
 
     // Add Blog URLs
@@ -53,6 +67,31 @@ export const generateSitemap = async (req, res) => {
     <lastmod>${blog.updatedAt.toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>`;
+    });
+
+    // Add Global Location URLs (pSEO)
+    locations.forEach((location) => {
+      // Location Home
+      sitemap += `
+  <url>
+    <loc>${baseUrl}/${location.slug}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>`;
+      // Location About
+      sitemap += `
+  <url>
+    <loc>${baseUrl}/${location.slug}/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+      // Location Contact
+      sitemap += `
+  <url>
+    <loc>${baseUrl}/${location.slug}/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>`;
     });
 

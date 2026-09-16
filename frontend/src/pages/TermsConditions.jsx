@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
+import { useLocationContext } from '../context/LocationContext';
 
 const TermsConditions = () => {
+  const { cityName } = useLocationContext();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -35,7 +38,7 @@ const TermsConditions = () => {
 
           <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">5. Governing Law</h2>
           <p className="mb-4">
-            These Terms shall be governed by and defined following the laws of India. ImageTech Industries and yourself irrevocably consent that the courts of New Delhi, India shall have exclusive jurisdiction to resolve any dispute which may arise in connection with these terms.
+            These Terms shall be governed by and defined following the laws of India. ImageTech Industries and yourself irrevocably consent that the courts of New {cityName}, India shall have exclusive jurisdiction to resolve any dispute which may arise in connection with these terms.
           </p>
 
           <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">6. Contact Us</h2>
@@ -45,7 +48,7 @@ const TermsConditions = () => {
           <address className="not-italic bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700">
             <strong>ImageTech Industries</strong><br />
             RZ-I-13, 2nd Floor, Nanda Block<br />
-            Mahavir Enclave, Delhi-110045, India<br />
+            Mahavir Enclave, {cityName}-110045, India<br />
             Email: imagetechindustries@gmail.com
           </address>
         </div>

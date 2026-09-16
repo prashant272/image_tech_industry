@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { MapPin, Mail, Phone, Clock, Send, Calendar, CheckCircle2 } from 'lucide-react';
 import CTA from '../components/home/CTA';
+import { useLocationContext } from '../context/LocationContext';
 
 export default function Contact() {
+  const { cityName } = useLocationContext();
   const [formData, setFormData] = useState({
     name: '', company: '', email: '', phone: '', subject: '', message: ''
   });
@@ -38,7 +40,7 @@ export default function Contact() {
   };
 
   const contactInfo = [
-    { icon: MapPin, title: 'Office', details: ['ImageTech Industries', 'RZ-I-13, 2ND FLOOR, NANDA BLOCK, MAHAVIR ENCLAVE, DELHI-110045, INDIA.'] },
+    { icon: MapPin, title: 'Office', details: ['ImageTech Industries', `RZ-I-13, 2ND FLOOR, NANDA BLOCK, MAHAVIR ENCLAVE, ${cityName.toUpperCase()}-110045, INDIA.`] },
     { icon: Mail, title: 'Email', details: ['imagetechindustries@gmail.com', 'sales.imagetechindustries@gmail.com'] },
     { icon: Phone, title: 'Phone', details: ['+91 8448336036', '+91 8851016580', '+91 8448441345'] },
     { icon: Clock, title: 'Business Hours', details: ['Monday – Saturday', '9:00 AM – 6:00 PM (IST)'] }

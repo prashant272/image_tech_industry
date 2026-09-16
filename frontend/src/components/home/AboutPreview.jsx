@@ -1,7 +1,9 @@
 import React from 'react';
 import { ArrowRight, Award, Zap, Users, Compass, Building2, UserCog, ShieldCheck, Globe2, Factory, Send } from 'lucide-react';
+import { useLocationContext } from '../../context/LocationContext';
 
 const AboutPreview = () => {
+  const { cityName } = useLocationContext();
   const topFeatures = [
     {
       icon: <Award className="w-5 h-5 text-[#d4af37]" />,
@@ -108,7 +110,7 @@ const AboutPreview = () => {
           </h2>
           
           <p className="text-gray-500 text-[14px] md:text-[15px] font-medium leading-relaxed mb-12 max-w-[95%] whitespace-normal">
-            ImageTech Industries is a Delhi-based manufacturing powerhouse dedicated to delivering reliable, innovative, and high-performance industrial solutions. With a strong foundation built over decades of engineering excellence, we design precision products that maximize productivity and accuracy.
+            ImageTech Industries is a {cityName}-based manufacturing powerhouse dedicated to delivering reliable, innovative, and high-performance industrial solutions. With a strong foundation built over decades of engineering excellence, we design precision products that maximize productivity and accuracy.
           </p>
 
           {/* 2x2 Grid with Hover Effects */}
