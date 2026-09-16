@@ -103,44 +103,44 @@ export default function QuoteModal() {
         </button>
 
         {/* Left Side: Image Branding Panel */}
-        <div className="flex w-full md:w-[55%] relative flex-col justify-between overflow-hidden bg-white shrink-0 min-h-[480px] md:min-h-0 pt-8 md:pt-0">
+        <div className="flex w-full md:w-[55%] relative flex-col justify-between overflow-hidden bg-white shrink-0 min-h-[380px] md:min-h-0 pt-2 md:pt-0">
           {/* Background Image Container */}
           <div className="absolute top-0 right-0 w-full h-full md:h-[calc(100%-72px)] z-0">
             <div 
               className="w-full h-full bg-right-bottom md:bg-right bg-no-repeat bg-[length:150%_auto] md:bg-[length:auto_100%]"
               style={{ backgroundImage: 'url(/images/popup-bg.jpg)' }}
             ></div>
-            {/* Soft White Fade to ensure text readability while letting the image show through */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/90 md:from-white/90 via-white/70 md:via-white/40 to-transparent w-[80%] md:w-[60%]"></div>
-            {/* Bottom Fade for Mobile so icons sit on white */}
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent h-[120px] top-auto md:hidden"></div>
+            {/* Soft White Fade (Desktop only) */}
+            <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-white/90 via-white/40 to-transparent w-[60%]"></div>
           </div>
 
           {/* Top Content Area */}
-          <div className="relative z-20 px-6 md:px-8 pt-4 md:pt-8 flex-1 flex flex-col">
+          <div className="relative z-20 px-6 md:px-8 pt-2 md:pt-8 flex-1 flex flex-col">
             {/* Logo */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="hidden md:flex items-center gap-3 mb-6">
               <img src="/images/logo.png" alt="Logo" className="h-10 w-auto" />
               <div className="text-[9px] text-slate-500 font-bold leading-tight border-l-2 border-slate-300 pl-3 uppercase tracking-wider">
                 Precision Solutions<br />For Printing Industry
               </div>
             </div>
 
-            {/* Heading - Reverted to original styling */}
-            <h2 className="text-3xl lg:text-4xl font-black mb-3 tracking-tight leading-[1.1] text-slate-800 drop-shadow-sm max-w-[50%] z-20 relative">
-              Quality Tools<br />for a <span className="text-orange-500">Sharper<br />Print Tomorrow</span>
+            {/* Heading - Responsive 2 lines on mobile, 4 on desktop */}
+            <h2 className="hidden md:block text-[22px] sm:text-[26px] leading-[1.2] md:text-3xl lg:text-4xl font-black mb-2 md:mb-3 tracking-tight md:leading-[1.1] text-slate-800 drop-shadow-sm w-[90%] md:w-auto md:max-w-[50%] z-20 relative">
+              <span className="inline md:hidden">Quality Tools for a <span className="text-orange-500">Sharper</span><br/></span>
+              <span className="hidden md:inline">Quality Tools<br />for a <span className="text-orange-500">Sharper<br /></span></span>
+              <span className="text-orange-500">Print Tomorrow</span>
             </h2>
 
             {/* Line separator */}
-            <div className="w-12 h-1 bg-orange-500 mb-4 rounded-full z-20 relative"></div>
+            <div className="hidden md:block w-12 h-1 bg-orange-500 mb-4 rounded-full z-20 relative"></div>
 
             {/* Description */}
-            <p className="text-[11px] lg:text-xs text-slate-600 leading-relaxed font-bold max-w-[45%] mb-8 z-20 relative">
+            <p className="hidden md:block text-[11px] lg:text-xs text-slate-600 leading-relaxed font-bold max-w-[85%] md:max-w-[45%] mb-6 md:mb-8 z-20 relative">
               From consumables to testing instruments, we support your printing & packaging process with reliable solutions.
             </p>
 
             {/* Horizontal Features */}
-            <div className="flex gap-6 justify-center md:justify-start pb-8 md:pb-0 relative z-20">
+            <div className="hidden md:flex gap-6 justify-center md:justify-start pb-8 md:pb-0 relative z-20">
               <div className="flex flex-col items-center text-center">
                 <div className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center mb-1.5 bg-white shadow-sm text-orange-500">
                   <CheckCircle2 size={20} />

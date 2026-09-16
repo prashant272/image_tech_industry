@@ -178,7 +178,7 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-3 lg:gap-4">
             <a
               href="tel:+918448441345"
-              className={`flex items-center gap-2 font-bold text-[13px] lg:text-[14px] transition-all hover:scale-105 px-3 py-2 rounded-full ${isTransparent ? 'bg-orange-500 text-white shadow-lg' : 'bg-orange-500 text-white shadow-md hover:bg-orange-600'}`}
+              className={`flex items-center gap-2 font-bold text-[13px] lg:text-[14px] transition-all hover:scale-105 px-4 py-2 rounded-full animate-pulse hover:animate-none ${isTransparent ? 'bg-orange-500 text-white shadow-lg' : 'bg-orange-500 text-white shadow-md hover:bg-orange-600'}`}
             >
               <Phone className="w-4 h-4" />
               +91 8448441345
@@ -193,25 +193,26 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Quick Actions & Menu Button */}
-          <div className="lg:hidden flex items-center gap-2 sm:gap-3">
+          <div className="lg:hidden flex items-center gap-1.5 sm:gap-2">
             <a
               href="tel:+918448441345"
-              className={`flex items-center justify-center w-8 h-8 rounded-full ${isTransparent ? 'bg-orange-500 text-white shadow-md' : 'bg-orange-500 text-white shadow-sm'}`}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-md font-bold text-[10px] sm:text-[11px] animate-pulse ${isTransparent ? 'bg-orange-500 text-white shadow-md' : 'bg-orange-500 text-white shadow-sm'}`}
             >
-              <Phone className="w-3.5 h-3.5" />
+              <Phone className="w-3 h-3" />
+              +91 8448441345
             </a>
             <button
               onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
-              className="bg-[#1e3a8a] text-white px-2.5 py-1.5 rounded-md font-bold text-[10px] flex items-center gap-1 shadow-sm"
+              className="bg-[#1e3a8a] text-white px-2 py-1.5 rounded-md font-bold text-[10px] sm:text-[11px] flex items-center gap-1 shadow-sm"
             >
-              <FileText className="w-3.5 h-3.5" />
+              <FileText className="w-3 h-3" />
               QUOTE
             </button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`p-1 focus:outline-none transition-colors ${isTransparent ? 'text-gray-900 bg-white/80 rounded-md' : 'text-gray-900'}`}
             >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMobileMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
             </button>
           </div>
 
