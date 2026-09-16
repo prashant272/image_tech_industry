@@ -57,6 +57,17 @@ export default function QuoteModal() {
     };
   }, []);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleChange = (e) => {
@@ -184,7 +195,7 @@ export default function QuoteModal() {
         </div>
 
         {/* Right Side: Form Panel */}
-        <div className="w-full md:w-[45%] bg-white p-6 md:p-8 relative flex flex-col shrink-0 md:shrink">
+        <div className="w-full md:w-[45%] bg-white p-6 md:p-8 relative flex flex-col shrink-0 md:shrink md:overflow-y-auto">
 
           <div className="mb-8 pr-12">
             <div className="flex items-center gap-2 text-orange-600 font-black text-[10px] tracking-widest uppercase mb-2">
