@@ -1,19 +1,50 @@
 import express from "express";
+import rateLimit from "express-rate-limit";
 import Enquiry from "../models/Enquiry.js";
 import { verifyAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
+// Rate limiter for enquiry submissions (max 5 requests per 15 minutes per IP)
+const enquiryLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 5,
+    message: { success: false, message: "Too many enquiries from this IP, please try again after 15 minutes." }
+});
+
 // Submit new enquiry (public route)
-router.post("/submit", async (req, res) => {
+router.post("/submit", enquiryLimiter, async (req, res) => {
     try {
-        const { name, company, email, phone, subject, message } = req.body;
+        const { name, company, email, phone, subject, message, website } = req.body;
+
+        // HONEYPOT: If the hidden 'website' field is filled, it's a bot.
+        // Return success so the bot thinks it worked, but don't save.
+        if (website) {
+            return res.status(200).json({ success: true, message: "Enquiry submitted successfully" });
+        }
 
         if (!name || !company || !email || !phone || !subject || !message) {
             return res.status(400).json({
                 success: false,
                 message: "Please fill all required fields"
             });
+        }
+
+        // REGEX VALIDATION
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ success: false, message: "Invalid email format" });
+        }
+
+        const phoneRegex = /^[0-9\+\-\s\(\)]{7,20}$/;
+        if (!phoneRegex.test(phone)) {
+            return res.status(400).json({ success: false, message: "Invalid phone number format" });
+        }
+
+        // Reject if message contains http/https links
+        const urlRegex = /(http|https):\/\/[^\s]+/;
+        if (urlRegex.test(message) || urlRegex.test(subject)) {
+            return res.status(400).json({ success: false, message: "Links/URLs are not allowed in the message" });
         }
 
         const enquiry = new Enquiry({

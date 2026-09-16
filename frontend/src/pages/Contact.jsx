@@ -6,7 +6,7 @@ import { useLocationContext } from '../context/LocationContext';
 export default function Contact() {
   const { cityName } = useLocationContext();
   const [formData, setFormData] = useState({
-    name: '', company: '', email: '', phone: '', subject: '', message: ''
+    name: '', company: '', email: '', phone: '', subject: '', message: '', website: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +29,7 @@ export default function Contact() {
       const res = await apiClient.post('/enquiry/submit', formData);
       if (res.data.success) {
         alert("Thanks for your message! We'll get back to you soon.");
-        setFormData({ name: '', company: '', email: '', phone: '', subject: '', message: '' });
+        setFormData({ name: '', company: '', email: '', phone: '', subject: '', message: '', website: '' });
       }
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -120,6 +120,9 @@ export default function Contact() {
                 </div>
               </div>
 
+              {/* Honeypot Field - Hidden from real users */}
+              <input type="text" name="website" value={formData.website} onChange={handleChange} style={{ display: 'none' }} tabIndex="-1" autoComplete="off" />
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[13px] font-black text-gray-700 uppercase tracking-widest ml-1">Email Address</label>
@@ -127,7 +130,7 @@ export default function Contact() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[13px] font-black text-gray-700 uppercase tracking-widest ml-1">Phone Number</label>
-                  <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-5 py-4 text-[15px] font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="+91 98765 43210" />
+                  <input required type="tel" name="phone" pattern="[0-9\+\-\s\(\)]{7,20}" title="Please enter a valid phone number" value={formData.phone} onChange={handleChange} className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-5 py-4 text-[15px] font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white transition-colors" placeholder="+91 98765 43210" />
                 </div>
               </div>
 

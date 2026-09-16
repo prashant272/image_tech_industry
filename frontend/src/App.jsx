@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Outlet } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import Home from './pages/Home';
@@ -19,6 +19,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
 import ShippingPolicy from './pages/ShippingPolicy';
 import LocationsDirectory from './pages/LocationsDirectory';
+import NotFound from './pages/NotFound';
 
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -29,6 +30,19 @@ import EnquiryList from './pages/admin/EnquiryList';
 import ProductCategoryManagement from './pages/admin/ProductCategoryManagement';
 import ProductManagement from './pages/admin/ProductManagement';
 import LocationManagement from './pages/admin/LocationManagement';
+import { useLocationContext } from './context/LocationContext';
+
+const LocationRouteGuard = ({ children }) => {
+  const { isLocationRoute, loading } = useLocationContext();
+  
+  if (loading) return null;
+  
+  if (!isLocationRoute) {
+    return <NotFound />;
+  }
+  
+  return children;
+};
 
 function App() {
   const location = useLocation();
@@ -73,7 +87,7 @@ function App() {
           <Route path="/sitemap" element={<LocationsDirectory />} />
           
           {/* Location-Prefixed Public Routes */}
-          <Route path="/:locationSlug">
+          <Route path="/:locationSlug" element={<LocationRouteGuard><Outlet /></LocationRouteGuard>}>
             <Route index element={<Home />} />
             <Route path="dashboards/:slug" element={<DashboardDetailPage />} />
             <Route path="features/:slug" element={<FeatureDetail />} />
@@ -92,7 +106,7 @@ function App() {
             <Route path="sitemap" element={<LocationsDirectory />} />
           </Route>
 
-          <Route path="*" element={<Home />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       {!isAdminRoute && <Footer />}
