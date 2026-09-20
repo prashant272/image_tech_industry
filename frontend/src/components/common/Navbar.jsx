@@ -57,7 +57,7 @@ const Navbar = () => {
     { name: 'Special Product', path: '/special-product', hasDropdown: true },
     { name: 'Certifications', path: '/images/certification.jpg', isExternal: true },
     { name: 'Blog', path: '/blog' },
-    { name: 'Sitemap', path: '/sitemap' },
+    // { name: 'Sitemap', path: '/sitemap' },
     { name: 'Contact Us', path: '/contact' },
   ];
 
