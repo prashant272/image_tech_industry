@@ -19,6 +19,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
 import ShippingPolicy from './pages/ShippingPolicy';
 import LocationsDirectory from './pages/LocationsDirectory';
+import CustomDetails from './pages/CustomDetails';
 import NotFound from './pages/NotFound';
 
 import AdminLogin from './pages/admin/AdminLogin';
@@ -29,6 +30,7 @@ import BlogManagement from './pages/admin/BlogManagement';
 import EnquiryList from './pages/admin/EnquiryList';
 import ProductCategoryManagement from './pages/admin/ProductCategoryManagement';
 import ProductManagement from './pages/admin/ProductManagement';
+import CustomPageManagement from './pages/admin/CustomPageManagement';
 import LocationManagement from './pages/admin/LocationManagement';
 import { useLocationContext } from './context/LocationContext';
 
@@ -63,6 +65,7 @@ function App() {
             <Route path="blogs" element={<BlogManagement />} />
             <Route path="products" element={<ProductManagement />} />
             <Route path="categories" element={<ProductCategoryManagement />} />
+            <Route path="custom-pages" element={<CustomPageManagement />} />
             <Route path="locations" element={<LocationManagement />} />
             <Route path="enquiries" element={<EnquiryList />} />
             <Route path="reviews" element={<div className="p-4 bg-white rounded shadow font-bold text-lg">Review Management (Coming Soon)</div>} />
@@ -89,6 +92,10 @@ function App() {
           {/* Location-Prefixed Public Routes */}
           <Route path="/:locationSlug" element={<LocationRouteGuard><Outlet /></LocationRouteGuard>}>
             <Route index element={<Home />} />
+            
+            {/* Custom Page prefixed with city (e.g. /delhi/doctor-blade) */}
+            <Route path=":slug" element={<CustomDetails />} />
+            
             <Route path="dashboards/:slug" element={<DashboardDetailPage />} />
             <Route path="features/:slug" element={<FeatureDetail />} />
             <Route path="industries" element={<Industries />} />

@@ -25,7 +25,17 @@ const Navbar = () => {
   }, []);
 
   const isHome = location.pathname === '/' || location.pathname === `/${citySlug}`;
-  const isTransparent = isHome && !scrolled;
+  
+  const standardRoutes = ['products', 'about', 'contact', 'blog', 'pricing', 'dashboards', 'features', 'industries', 'privacy-policy', 'terms-conditions', 'shipping-policy', 'sitemap', 'admin'];
+  const parts = location.pathname.split('/').filter(Boolean);
+  let isCustomPage = false;
+  if (parts.length === 1 && !standardRoutes.includes(parts[0])) {
+    isCustomPage = true;
+  } else if (parts.length === 2 && !standardRoutes.includes(parts[0]) && !standardRoutes.includes(parts[1])) {
+    isCustomPage = true;
+  }
+
+  const isTransparent = (isHome || isCustomPage) && !scrolled;
 
   const [dbCategories, setDbCategories] = useState([]);
   const [dbProducts, setDbProducts] = useState([]);

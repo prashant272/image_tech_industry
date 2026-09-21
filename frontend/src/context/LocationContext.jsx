@@ -10,6 +10,7 @@ export const LocationProvider = ({ children }) => {
   const [locations, setLocations] = useState([]);
   const [currentCityName, setCurrentCityName] = useState('Delhi');
   const [currentCitySlug, setCurrentCitySlug] = useState('delhi');
+  const [currentCityState, setCurrentCityState] = useState('Delhi');
   const [isLocationRoute, setIsLocationRoute] = useState(false);
   const [loading, setLoading] = useState(true);
   const { pathname } = useLocation();
@@ -42,17 +43,20 @@ export const LocationProvider = ({ children }) => {
       if (foundLocation) {
         setCurrentCityName(foundLocation.name);
         setCurrentCitySlug(foundLocation.slug);
+        setCurrentCityState(foundLocation.state || '');
         setIsLocationRoute(true);
       } else {
         // Fallback to default if not a location (e.g., it's '/about' or '/products')
         setCurrentCityName('Delhi');
         setCurrentCitySlug('delhi');
+        setCurrentCityState('Delhi');
         setIsLocationRoute(false);
       }
     } else {
       // Root '/'
       setCurrentCityName('Delhi');
       setCurrentCitySlug('delhi');
+      setCurrentCityState('Delhi');
       setIsLocationRoute(false);
     }
   }, [pathname, locations, loading]);
@@ -62,8 +66,18 @@ export const LocationProvider = ({ children }) => {
   }
 
   return (
-    <LocationContext.Provider value={{ cityName: currentCityName, citySlug: currentCitySlug, isLocationRoute, loading }}>
+    <LocationContext.Provider 
+      value={{ 
+        locations, 
+        cityName: currentCityName, 
+        citySlug: currentCitySlug, 
+        stateName: currentCityState,
+        isLocationRoute, 
+        loading 
+      }}
+    >
       {children}
     </LocationContext.Provider>
   );
 };
+

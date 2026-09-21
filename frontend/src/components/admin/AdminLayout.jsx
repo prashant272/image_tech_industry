@@ -10,7 +10,8 @@ import {
   LogOut,
   Menu,
   X,
-  MapPin
+  MapPin,
+  Layers
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -36,6 +37,7 @@ const AdminLayout = () => {
     { name: 'Blog Management', path: '/admin/blogs', icon: FileText },
     { name: 'Product Management', path: '/admin/products', icon: Package },
     { name: 'Products Category', path: '/admin/categories', icon: Tags },
+    { name: 'Custom Pages', path: '/admin/custom-pages', icon: Layers },
     { name: 'Locations (pSEO)', path: '/admin/locations', icon: MapPin },
     { name: 'Enquiry List', path: '/admin/enquiries', icon: MessageSquare },
     { name: 'Review Management', path: '/admin/reviews', icon: Star },
