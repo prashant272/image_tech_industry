@@ -5,6 +5,10 @@
       "destination": "https://api.imagetechindustries.com/api/sitemap.xml"
     },
     {
+      "source": "/:spam([a-z]\\d{10,20})",
+      "destination": "/404-spam-blocked"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
