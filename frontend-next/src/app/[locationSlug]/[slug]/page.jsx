@@ -1,54 +1,60 @@
 import { notFound } from 'next/navigation';
 import { getLocationBySlug } from '@/lib/locations';
 import CustomDetails from '@/pages-components/CustomDetails';
+import { buildPageMetadata, webPageJsonLd, breadcrumbJsonLd, fillTemplate } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
+
+async function getCustomPage(slug) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:5000/api';
+  try {
+    const res = await fetch(`${apiUrl}/custom-pages/${slug}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    return null;
+  }
+}
 
 export async function generateMetadata({ params }) {
   const { locationSlug, slug } = await params;
   const location = await getLocationBySlug(locationSlug);
-  const cityName = location ? location.name : 'Delhi';
-  const stateName = location ? (location.state || cityName) : 'Delhi';
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:5000/api';
-
-  try {
-    const res = await fetch(`${apiUrl}/custom-pages/${slug}`, { next: { revalidate: 60 } });
-    if (res.ok) {
-      const page = await res.json();
-      if (page) {
-        const replacePlaceholders = (text) => {
-          if (!text || typeof text !== 'string') return text;
-          return text.replace(/{city}/gi, cityName).replace(/{state}/gi, stateName);
-        };
-
-        const metaTitle = replacePlaceholders(page.metaTitle || page.heroTitle || page.title);
-        const metaDesc = replacePlaceholders(page.metaDescription || page.heroSubtitle);
-        const metaKeywords = replacePlaceholders(page.metaKeywords);
-
-        return {
-          title: `${metaTitle} | Imagetech Industries`,
-          description: metaDesc,
-          keywords: metaKeywords ? metaKeywords.split(',').map(s => s.trim()) : undefined,
-          openGraph: {
-            title: metaTitle,
-            description: metaDesc,
-            images: page.heroImage ? [{ url: page.heroImage }] : [],
-          },
-        };
-      }
-    }
-  } catch (err) {
-    console.error('Error generating custom page metadata:', err);
+  if (!location) {
+    return buildPageMetadata({
+      title: "Page Not Found",
+      description: "The requested location or product page does not exist.",
+      path: `/${locationSlug}/${slug}`,
+      noindex: true,
+    });
   }
 
-  const formatted = (slug || '')
-    .split('-')
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
+  const page = await getCustomPage(slug);
+  if (!page) {
+    return buildPageMetadata({
+      title: "Page Not Found",
+      description: "The requested page does not exist in our directory.",
+      path: `/${locationSlug}/${slug}`,
+      noindex: true,
+    });
+  }
 
-  return {
-    title: '404 - Page Not Found | Imagetech Industries',
-    robots: { index: false, follow: false },
-  };
+  const cityName = location.name;
+  const stateName = location.state || cityName;
+
+  const rawTitle = page.metaTitle || page.heroTitle || page.title || `${slug} Manufacturer in {city}`;
+  const rawDesc = page.metaDescription || page.heroSubtitle || `High quality industrial ${slug} manufactured and supplied in {city}, {state} by ImageTech Industries.`;
+
+  const title = fillTemplate(rawTitle, { city: cityName, state: stateName });
+  const description = fillTemplate(rawDesc, { city: cityName, state: stateName });
+
+  const ogImageUrl = page.heroImage || null;
+
+  return buildPageMetadata({
+    title,
+    description,
+    path: `/${locationSlug}/${slug}`,
+    image: ogImageUrl ? { url: ogImageUrl, width: 1200, height: 630, alt: title } : undefined,
+  });
 }
 
 export default async function LocationCustomPage({ params }) {
@@ -59,15 +65,32 @@ export default async function LocationCustomPage({ params }) {
     notFound();
   }
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:5000/api';
-  try {
-    const res = await fetch(`${apiUrl}/custom-pages/${slug}`, { next: { revalidate: 60 } });
-    if (!res.ok) {
-      notFound();
-    }
-  } catch (err) {
+  const page = await getCustomPage(slug);
+  if (!page) {
     notFound();
   }
 
-  return <CustomDetails />;
+  const cityName = location.name;
+  const stateName = location.state || cityName;
+  const title = fillTemplate(page.heroTitle || page.title || slug, { city: cityName, state: stateName });
+
+  const wpSchema = webPageJsonLd({
+    type: "WebPage",
+    name: title,
+    description: fillTemplate(page.metaDescription || page.heroSubtitle || "", { city: cityName, state: stateName }),
+    path: `/${locationSlug}/${slug}`,
+  });
+
+  const bcSchema = breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: location.name, path: `/${locationSlug}` },
+    { name: title, path: `/${locationSlug}/${slug}` },
+  ]);
+
+  return (
+    <>
+      <JsonLd data={[wpSchema, bcSchema]} />
+      <CustomDetails />
+    </>
+  );
 }

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import BlogDetail from '@/pages-components/BlogDetail';
+import { buildPageMetadata } from '@/lib/seo';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -10,16 +11,13 @@ export async function generateMetadata({ params }) {
     if (res.ok) {
       const blog = await res.json();
       if (blog) {
-        return {
-          title: `${blog.metaTitle || blog.title} | Imagetech Industries`,
-          description: blog.metaDescription || blog.excerpt || blog.content?.slice(0, 160),
-          keywords: blog.metaKeywords ? blog.metaKeywords.split(',').map(s => s.trim()) : undefined,
-          openGraph: {
-            title: blog.metaTitle || blog.title,
-            description: blog.metaDescription || blog.excerpt,
-            images: blog.featuredImage ? [{ url: blog.featuredImage }] : [],
-          },
-        };
+        return buildPageMetadata({
+          title: blog.metaTitle || blog.title,
+          description: blog.metaDescription || blog.excerpt || blog.content?.slice(0, 160) || `Insights on ${blog.title} from ImageTech Industries.`,
+          path: `/blog/${slug}`,
+          image: blog.featuredImage ? { url: blog.featuredImage, width: 1200, height: 630, alt: blog.title } : undefined,
+          type: 'article',
+        });
       }
     }
   } catch (err) {
@@ -31,10 +29,11 @@ export async function generateMetadata({ params }) {
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 
-  return {
-    title: `${formatted} | Imagetech Industries Blog`,
-    description: `Read about ${formatted} on the Imagetech Industries blog.`,
-  };
+  return buildPageMetadata({
+    title: formatted,
+    description: `Read technical insights on ${formatted} from ImageTech Industries.`,
+    path: `/blog/${slug}`,
+  });
 }
 
 export default async function BlogDetailPage({ params }) {

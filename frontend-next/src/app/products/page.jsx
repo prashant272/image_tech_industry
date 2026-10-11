@@ -1,11 +1,31 @@
 import Products from '@/pages-components/Products';
+import { buildPageMetadata, breadcrumbJsonLd, webPageJsonLd } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 
-export const metadata = {
-  title: 'Our Products | Printing & Packaging Machinery Accessories | Imagetech Industries',
+export const metadata = buildPageMetadata({
+  title: 'Our Products | Printing & Packaging Machinery Accessories',
   description:
-    'Explore our comprehensive catalogue of doctor blades, ink mixing rollers, bar coaters, dyne test pens, slitting blades, stroboscopes and testing instruments.',
-};
+    'Browse ImageTech Industries catalogue of WIPEX carbon steel doctor blades, polymer blades, magnetic ink mixing rollers, wire bar coaters, dyne test pens, and slitting blades.',
+  path: '/products',
+});
 
 export default function ProductsPage() {
-  return <Products />;
+  const wpSchema = webPageJsonLd({
+    type: "CollectionPage",
+    name: "Printing & Packaging Machinery Products Catalogue",
+    description: "Industrial doctor blades, mixing rollers, testing equipment, and machine accessories catalogue.",
+    path: "/products",
+  });
+
+  const bcSchema = breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Products", path: "/products" },
+  ]);
+
+  return (
+    <>
+      <JsonLd data={[wpSchema, bcSchema]} />
+      <Products />
+    </>
+  );
 }

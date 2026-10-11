@@ -1,11 +1,21 @@
 import Home from '@/pages-components/Home';
+import { buildPageMetadata, homepageJsonLd } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 
-export const metadata = {
-  title: 'Imagetech Industries | Printing & Packaging Industry Products',
+export const metadata = buildPageMetadata({
+  title: "Printing & Packaging Machinery Accessories Manufacturer, Supplier & Exporter",
   description:
-    'Imagetech Industries supplies doctor blades, magnetic ink mixing rollers, bar coaters, dyne test pens, stroboscopes, GSM testing products, slitting blades and other printing and packaging industry accessories.',
-};
+    "Leading manufacturer, supplier and global exporter of high-precision printing, packaging, and lamination machinery accessories — doctor blades, ink mixing rollers, wire bar coaters, dyne test pens, slitting blades and testing equipment.",
+  path: "/",
+});
 
 export default function HomePage() {
-  return <Home />;
+  const schema = homepageJsonLd();
+
+  return (
+    <>
+      <JsonLd data={schema} />
+      <Home />
+    </>
+  );
 }

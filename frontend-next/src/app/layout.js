@@ -1,41 +1,34 @@
 import { Suspense } from "react";
 import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from "@/lib/seo";
+
+const DEFAULT_TITLE = "ImageTech Industries | Printing & Packaging Machinery Accessories Manufacturer & Exporter";
+const DEFAULT_DESCRIPTION =
+  "Manufacturer, supplier and global exporter of high-precision printing, packaging, and lamination machinery accessories — doctor blades, ink mixing rollers, wire bar coaters, dyne test pens, slitting blades, stroboscopes and testing equipment. Worldwide export & B2B supply.";
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://imagetechindustries.com'),
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
   title: {
-    default: "Imagetech Industries | Printing & Packaging Industry Products",
-    template: "%s | Imagetech Industries",
+    default: DEFAULT_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Imagetech Industries supplies doctor blades, magnetic ink mixing rollers, bar coaters, dyne test pens, stroboscopes, GSM testing products, slitting blades and other printing and packaging industry accessories.",
+  description: DEFAULT_DESCRIPTION,
   keywords: [
-    "Imagetech Industries",
-    "doctor blade",
-    "doctor blade manufacturer",
-    "carbon steel doctor blade",
-    "polymer doctor blade",
-    "plastic doctor blade",
-    "Wipex doctor blade",
-    "magnetic ink mixing roller",
-    "bar coater",
-    "draw down pad",
-    "dyne test pen",
-    "dyne test ink",
-    "stroboscope",
-    "nylon filter cloth",
-    "GSM round cutter",
-    "Teflon dam",
-    "solventless lamination accessories",
-    "Lutz slitting blade",
-    "Mozart slitting blade",
-    "cylinder cleaning brush",
-    "printing industry products",
-    "packaging industry products",
-    "printing machine accessories",
+    "ImageTech Industries",
+    "printing machine accessories manufacturer",
+    "packaging machinery accessories supplier",
+    "lamination machine accessories exporter",
+    "doctor blades manufacturer",
+    "magnetic ink mixing rollers",
+    "wire bar coaters",
+    "dyne test pens",
+    "slitting blades",
+    "solventless lamination teflon dams",
+    "printing consumables exporter India"
   ],
-  authors: [{ name: "Imagetech Industries" }],
+  authors: [{ name: SITE_NAME }],
   robots: {
     index: true,
     follow: true,
@@ -48,67 +41,36 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: "Imagetech Industries | Printing & Packaging Industry Products",
-    description:
-      "Explore doctor blades, ink mixing rollers, bar coaters, dyne testing products, stroboscopes, GSM testing products, slitting blades and other printing and packaging industry accessories from Imagetech Industries.",
-    url: "https://imagetechindustries.com/",
-    siteName: "Imagetech Industries",
-    images: [
-      {
-        url: "https://imagetechindustries.com/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Imagetech Industries",
-      },
-    ],
-    locale: "en_US",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    siteName: SITE_NAME,
+    locale: "en_IN",
     type: "website",
+    images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Imagetech Industries | Printing & Packaging Industry Products",
-    description:
-      "Printing and packaging industry products including doctor blades, ink mixing rollers, bar coaters, dyne testing products, stroboscopes and GSM testing equipment.",
-    images: ["https://imagetechindustries.com/og-image.jpg"],
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE.url],
   },
   icons: {
-    icon: "/images/logo.png",
+    icon: [
+      { url: "/images/logo.png" },
+      { url: "/favicon.ico" }
+    ],
+    shortcut: "/images/logo.png",
+    apple: "/images/logo.png",
   },
 };
 
 export default function RootLayout({ children }) {
-  const orgJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Imagetech Industries",
-    url: "https://imagetechindustries.com/",
-    logo: "https://imagetechindustries.com/logo.png",
-    description:
-      "Imagetech Industries supplies products and accessories for the printing and packaging industry, including doctor blades, ink mixing rollers, bar coaters, dyne testing products, stroboscopes, GSM testing products and slitting blades.",
-  };
-
-  const webJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Imagetech Industries",
-    url: "https://imagetechindustries.com/",
-  };
-
   return (
-    <html lang="en">
+    <html lang="en-IN">
       <head>
         <link rel="icon" type="image/png" href="/images/logo.png" />
         <link rel="shortcut icon" href="/images/logo.png" />
         <link rel="apple-touch-icon" href="/images/logo.png" />
-        <link rel="preload" as="image" href="/images/popup-bg.jpg" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(webJsonLd) }}
-        />
       </head>
       <body>
         <Suspense fallback={null}>
