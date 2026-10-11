@@ -327,14 +327,14 @@ export default function ProductDetail() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {relatedProducts.map(p => (
-              <div key={p.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden group hover:shadow-lg transition-shadow">
+            {relatedProducts.map((p, idx) => (
+              <div key={p._id || p.id || p.slug || idx} className="bg-white rounded-xl border border-gray-200 overflow-hidden group hover:shadow-lg transition-shadow">
                 <div className="h-40 bg-gray-50 border-b border-gray-100 p-4">
-                  <img src={p.images[0]} alt={p.title} loading="lazy" decoding="async" className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" />
+                  <img src={typeof p.images?.[0] === 'object' ? p.images[0].url : (p.images?.[0] || '/images/logo.png')} alt={p.title || p.name || 'Product'} loading="lazy" decoding="async" className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-4 flex flex-col h-[140px]">
                   <h4 className="font-bold text-[14px] text-gray-900 leading-snug mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {p.title}
+                    {p.title || p.name}
                   </h4>
                   <div className="mt-auto pt-4">
                     <Link to={`/products/${p.slug}`} className="w-full bg-[#0f172a] hover:bg-blue-700 text-white py-2 rounded-lg text-[12px] font-bold transition-colors flex items-center justify-center gap-2">
