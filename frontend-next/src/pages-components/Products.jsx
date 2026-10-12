@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from '@/compat/react-router';
 import { 
-  Search, ChevronDown, Grid, List, Bookmark, 
+  Search, ChevronDown, ChevronRight, Layers, Grid, List, Bookmark, 
   CheckCircle2, ShieldCheck, Truck, Headset, Settings
 } from 'lucide-react';
 import apiClient from '../api/client';
@@ -23,6 +23,7 @@ export default function Products({ isSpecialOnly = false }) {
   const productsPerPage = 6;
   
   const [dbCategories, setDbCategories] = useState([]);
+  const [dbSubcategories, setDbSubcategories] = useState([]);
   const [dbProducts, setDbProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,20 +31,29 @@ export default function Products({ isSpecialOnly = false }) {
     window.scrollTo(0, 0);
     const params = new URLSearchParams(location.search);
     const categoryParam = params.get('category');
+    const subcategoryParam = params.get('subcategory');
     
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [catRes, prodRes] = await Promise.all([
+        const [catRes, subRes, prodRes] = await Promise.all([
           apiClient.get('/categories'),
+          apiClient.get('/subcategories'),
           apiClient.get('/products')
         ]);
         
         const fetchedCategories = catRes.data.filter(c => c.status === 'Active') || [];
+        const fetchedSubcategories = subRes.data.filter(s => s.status === 'Active') || [];
         setDbCategories(fetchedCategories);
+        setDbSubcategories(fetchedSubcategories);
         setDbProducts(prodRes.data || []);
         
-        if (categoryParam) {
+        if (subcategoryParam) {
+          const matchedSub = fetchedSubcategories.find(s => s.slug === subcategoryParam);
+          if (matchedSub) {
+            setActiveCategory(matchedSub.name);
+          }
+        } else if (categoryParam) {
           const matchedCat = fetchedCategories.find(c => c.slug === categoryParam);
           if (matchedCat) {
             setActiveCategory(matchedCat.name);
@@ -68,11 +78,13 @@ export default function Products({ isSpecialOnly = false }) {
   const availableProducts = isSpecial ? dbProducts.filter(p => Boolean(p.isSpecial)) : dbProducts;
 
   const categories = [
-    { name: defaultCategoryTitle, count: availableProducts.length },
+    { _id: 'all', name: defaultCategoryTitle, count: availableProducts.length },
     ...dbCategories
       .filter(cat => !isSpecial || availableProducts.some(p => p.category?._id === cat._id))
       .map(cat => ({
+        _id: cat._id,
         name: cat.name,
+        slug: cat.slug,
         count: availableProducts.filter(p => p.category?._id === cat._id).length
       }))
   ];
@@ -80,13 +92,16 @@ export default function Products({ isSpecialOnly = false }) {
   const productsList = availableProducts.map(p => ({
     ...p,
     categoryName: p.category?.name?.toUpperCase() || 'N/A',
+    subcategoryName: p.subcategory?.name || null,
     image: p.images && p.images.length > 0 ? p.images[0] : '',
     desc: p.shortDesc || ''
   }));
 
   const filteredProducts = productsList.filter(product => {
     const isAll = activeCategory === 'All Products' || activeCategory === 'All Special Products';
-    const matchesCategory = isAll || (product.category?.name && product.category.name.toLowerCase() === activeCategory.toLowerCase());
+    const matchesCategory = isAll || 
+      (product.category?.name && product.category.name.toLowerCase() === activeCategory.toLowerCase()) ||
+      (product.subcategory?.name && product.subcategory.name.toLowerCase() === activeCategory.toLowerCase());
     const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) || product.desc.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -140,29 +155,63 @@ export default function Products({ isSpecialOnly = false }) {
             {/* Product Categories Box */}
             <div className="bg-white/90 backdrop-blur-md rounded-xl border border-gray-200 p-5 shadow-sm">
               <h3 className="font-bold text-[16px] text-gray-900 mb-5">Product Categories</h3>
-              <ul className="space-y-1">
+              <ul className="space-y-1.5">
                 {categories.map((cat, idx) => {
-                  const isActive = activeCategory === cat.name;
+                  const isActive = activeCategory.toLowerCase() === cat.name.toLowerCase();
+                  const subcats = cat._id === 'all' 
+                    ? [] 
+                    : dbSubcategories.filter(s => (s.category?._id === cat._id || s.category === cat._id) && (!isSpecial || availableProducts.some(p => p.subcategory?._id === s._id)));
+
                   return (
-                  <li key={idx}>
-                    <button 
-                      onClick={() => setActiveCategory(cat.name)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-[14px] font-semibold transition-all duration-200 ${isActive ? 'bg-[#1e3a8a] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
-                    >
-                      <span className="flex items-center gap-3">
-                        {isActive ? (
-                          <Grid className="w-4 h-4" />
-                        ) : (
-                          <div className="w-4 h-4 rounded-full border border-gray-300"></div>
-                        )}
-                        {cat.name}
-                      </span>
-                      <span className={`text-[12px] px-2.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                        {cat.count}
-                      </span>
-                    </button>
-                  </li>
-                  )
+                    <li key={idx} className="space-y-1">
+                      <button 
+                        onClick={() => setActiveCategory(cat.name)}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-[14px] font-semibold transition-all duration-200 ${isActive ? 'bg-[#1e3a8a] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
+                      >
+                        <span className="flex items-center gap-3">
+                          {isActive ? (
+                            <Grid className="w-4 h-4" />
+                          ) : (
+                            <div className="w-4 h-4 rounded-full border border-gray-300"></div>
+                          )}
+                          <span className="truncate">{cat.name}</span>
+                        </span>
+                        <span className={`text-[12px] px-2.5 py-0.5 rounded-full font-bold ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                          {cat.count}
+                        </span>
+                      </button>
+
+                      {/* Subcategories list if any */}
+                      {subcats.length > 0 && (
+                        <ul className="pl-6 pr-1 py-1 space-y-1 border-l-2 border-gray-100 ml-4">
+                          {subcats.map((sub) => {
+                            const isSubActive = activeCategory.toLowerCase() === sub.name.toLowerCase();
+                            const subProductCount = availableProducts.filter(p => p.subcategory?._id === sub._id || p.subcategory === sub._id).length;
+                            return (
+                              <li key={sub._id}>
+                                <button
+                                  onClick={() => setActiveCategory(sub.name)}
+                                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-[13px] font-medium transition-all duration-150 ${
+                                    isSubActive 
+                                      ? 'bg-blue-50 text-[#1e3a8a] font-bold shadow-xs' 
+                                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  <span className="flex items-center gap-1.5 truncate">
+                                    <ChevronRight className={`w-3.5 h-3.5 ${isSubActive ? 'text-[#1e3a8a]' : 'text-gray-400'}`} />
+                                    <span className="truncate">{sub.name}</span>
+                                  </span>
+                                  <span className={`text-[11px] px-2 py-0.2 rounded-full font-semibold ${isSubActive ? 'bg-blue-100 text-[#1e3a8a]' : 'bg-gray-100 text-gray-400'}`}>
+                                    {subProductCount}
+                                  </span>
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
                 })}
               </ul>
             </div>
@@ -209,9 +258,23 @@ export default function Products({ isSpecialOnly = false }) {
                     onChange={(e) => setActiveCategory(e.target.value)}
                     className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-4 py-3 text-[14px] font-semibold text-gray-700 focus:outline-none focus:border-[#1e3a8a] cursor-pointer shadow-sm hover:border-gray-300 transition-colors"
                   >
-                    {categories.map((cat, i) => (
-                      <option key={i} value={cat.name}>{cat.name}</option>
-                    ))}
+                    <option value={defaultCategoryTitle}>{defaultCategoryTitle}</option>
+                    {categories.filter(c => c._id !== 'all').map((cat) => {
+                      const subcats = dbSubcategories.filter(s => (s.category?._id === cat._id || s.category === cat._id) && (!isSpecial || availableProducts.some(p => p.subcategory?._id === s._id)));
+                      if (subcats.length > 0) {
+                        return (
+                          <optgroup key={cat._id} label={cat.name}>
+                            <option value={cat.name}>All {cat.name} ({cat.count})</option>
+                            {subcats.map((s) => (
+                              <option key={s._id} value={s.name}>&nbsp;&nbsp;↳ {s.name}</option>
+                            ))}
+                          </optgroup>
+                        );
+                      }
+                      return (
+                        <option key={cat._id} value={cat.name}>{cat.name} ({cat.count})</option>
+                      );
+                    })}
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none group-hover:text-gray-800 transition-colors" />
                 </div>
@@ -283,9 +346,17 @@ export default function Products({ isSpecialOnly = false }) {
 
                   {/* Content */}
                   <div className={`p-5 flex flex-col flex-grow ${viewMode === 'list' ? 'justify-center' : ''}`}>
-                    <span className="text-[11px] font-black text-blue-700 uppercase tracking-widest mb-1.5 block">
-                      {product.categoryName}
-                    </span>
+                    <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider mb-1.5 flex-wrap">
+                      <span className="text-blue-700">{product.categoryName}</span>
+                      {product.subcategoryName && (
+                        <>
+                          <span className="text-gray-300 font-normal">/</span>
+                          <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded font-bold text-[10px] lowercase first-letter:uppercase">
+                            {product.subcategoryName}
+                          </span>
+                        </>
+                      )}
+                    </div>
                     <h3 className="text-[17px] font-black text-black mb-2 leading-tight group-hover:text-[#1e3a8a] transition-colors">
                       <Link to={`/products/${product.slug}`} className="hover:text-[#1e3a8a]">
                         {product.title}

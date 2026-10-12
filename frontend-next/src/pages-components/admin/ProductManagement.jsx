@@ -7,13 +7,14 @@ import ProductPreview from '../../components/admin/ProductPreview';
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const initialFormState = {
-    title: '', slug: '', category: '', isSpecial: false, shortDesc: '', longDesc: '',
+    title: '', slug: '', category: '', subcategory: '', isSpecial: false, shortDesc: '', longDesc: '',
     images: [''], features: [''], infoBoxes: [{ title: '', value: '', icon: '' }],
     overviewFeatures: [{ title: '', desc: '', icon: '' }], overviewText: [''],
     faqs: [{ question: '', answer: '' }], specifications: [{ label: '', value: '' }],
@@ -24,6 +25,7 @@ const ProductManagement = () => {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
+    fetchSubcategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -41,6 +43,15 @@ const ProductManagement = () => {
       setCategories(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
+    }
+  };
+
+  const fetchSubcategories = async () => {
+    try {
+      const response = await apiClient.get('/subcategories');
+      setSubcategories(response.data);
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
     }
   };
 
@@ -79,17 +90,24 @@ const ProductManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        category: formData.category || null,
+        subcategory: formData.subcategory ? formData.subcategory : null
+      };
+
       if (editingId) {
-        await apiClient.put(`/products/${editingId}`, formData);
+        await apiClient.put(`/products/${editingId}`, payload);
       } else {
-        await apiClient.post('/products', formData);
+        await apiClient.post('/products', payload);
       }
       setShowModal(false);
       setFormData(initialFormState);
       setEditingId(null);
       fetchProducts();
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error('Error saving product:', error.response?.data || error.message);
+      alert(`Failed to save product: ${error.response?.data?.error || error.response?.data?.message || error.message}`);
     }
   };
 
@@ -118,7 +136,8 @@ const ProductManagement = () => {
     setFormData({
       title: product.title || '',
       slug: product.slug || '',
-      category: product.category?._id || '',
+      category: product.category?._id || product.category || '',
+      subcategory: product.subcategory?._id || product.subcategory || '',
       isSpecial: product.isSpecial || false,
       shortDesc: product.shortDesc || '',
       longDesc: product.longDesc || '',
@@ -141,7 +160,8 @@ const ProductManagement = () => {
     setFormData({
       title: `${product.title || ''} (Copy)`,
       slug: `${product.slug || ''}-copy`,
-      category: product.category?._id || '',
+      category: product.category?._id || product.category || '',
+      subcategory: product.subcategory?._id || product.subcategory || '',
       isSpecial: product.isSpecial || false,
       shortDesc: product.shortDesc || '',
       longDesc: product.longDesc || '',
@@ -210,6 +230,7 @@ const ProductManagement = () => {
             <tr>
               <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Product Title</th>
               <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Category</th>
+              <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Subcategory</th>
               <th scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Special</th>
               <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
             </tr>
@@ -219,6 +240,11 @@ const ProductManagement = () => {
               <tr key={product._id} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-bold text-gray-900">{product.title}</div></td>
                 <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-500">{product.category?.name || 'N/A'}</div></td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-blue-600">
+                    {product.subcategory?.name || <span className="text-gray-400 italic font-normal">—</span>}
+                  </div>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span className={`inline-flex px-3 py-1 text-xs font-bold leading-5 rounded-full ${product.isSpecial ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
                     {product.isSpecial ? 'Yes' : 'No'}
@@ -232,7 +258,7 @@ const ProductManagement = () => {
               </tr>
             ))}
             {products.length === 0 && (
-              <tr><td colSpan="4" className="px-6 py-10 text-center text-gray-500 font-medium">No products found. Start by adding one.</td></tr>
+              <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-500 font-medium">No products found. Start by adding one.</td></tr>
             )}
           </tbody>
         </table>
@@ -263,12 +289,36 @@ const ProductManagement = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                    <select required value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <select 
+                      required 
+                      value={formData.category} 
+                      onChange={(e) => {
+                        const newCat = e.target.value;
+                        setFormData({ ...formData, category: newCat, subcategory: '' });
+                      }} 
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    >
                       <option value="">Select Category</option>
                       {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                     </select>
                   </div>
-                  <div className="flex items-center mt-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Subcategory <span className="text-gray-400 font-normal">(Optional if category has none)</span>
+                    </label>
+                    <select 
+                      value={formData.subcategory || ''} 
+                      onChange={(e) => setFormData({...formData, subcategory: e.target.value})} 
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"
+                      disabled={!formData.category}
+                    >
+                      <option value="">None (Direct under Category)</option>
+                      {subcategories
+                        .filter(s => s.category?._id === formData.category || s.category === formData.category)
+                        .map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                    </select>
+                  </div>
+                  <div className="flex items-center mt-2">
                     <input type="checkbox" id="isSpecial" checked={formData.isSpecial} onChange={(e) => setFormData({...formData, isSpecial: e.target.checked})} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
                     <label htmlFor="isSpecial" className="ml-2 block text-sm text-gray-900 font-medium">Mark as Special Product</label>
                   </div>

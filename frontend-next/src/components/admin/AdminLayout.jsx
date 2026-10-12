@@ -38,6 +38,7 @@ const AdminLayout = ({ children }) => {
     { name: 'Blog Management', path: '/admin/blogs', icon: FileText },
     { name: 'Product Management', path: '/admin/products', icon: Package },
     { name: 'Products Category', path: '/admin/categories', icon: Tags },
+    { name: 'Products Subcategory', path: '/admin/subcategories', icon: Layers },
     { name: 'Custom Pages', path: '/admin/custom-pages', icon: Layers },
     { name: 'Locations (pSEO)', path: '/admin/locations', icon: MapPin },
     { name: 'Enquiry List', path: '/admin/enquiries', icon: MessageSquare },

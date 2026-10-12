@@ -26,6 +26,7 @@ const productSchema = new mongoose.Schema({
   title: { type: String, required: true },
   slug: { type: String, required: true, unique: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+  subcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'Subcategory' },
   isSpecial: { type: Boolean, default: false },
   shortDesc: { type: String },
   longDesc: { type: String },

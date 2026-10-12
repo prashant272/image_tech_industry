@@ -3,7 +3,7 @@ import Location from '../models/Location.js';
 
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate('category');
+    const products = await Product.find().populate('category').populate('subcategory');
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching products', error: error.message });
@@ -31,7 +31,7 @@ export const getProductBySlug = async (req, res) => {
       }
     }
 
-    let product = await Product.findOne({ slug: productSlug }).populate('category');
+    let product = await Product.findOne({ slug: productSlug }).populate('category').populate('subcategory');
     if (!product) return res.status(404).json({ message: 'Product not found' });
     
     // Dynamic Location SEO Replacement
@@ -80,7 +80,11 @@ export const getProductBySlug = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const product = new Product(req.body);
+    const data = { ...req.body };
+    if (!data.subcategory) {
+      data.subcategory = null;
+    }
+    const product = new Product(data);
     await product.save();
     res.status(201).json(product);
   } catch (error) {
@@ -91,7 +95,11 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, req.body, { new: true });
+    const data = { ...req.body };
+    if (!data.subcategory) {
+      data.subcategory = null;
+    }
+    const product = await Product.findByIdAndUpdate(id, data, { new: true });
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {
