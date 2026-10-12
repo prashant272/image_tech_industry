@@ -33,8 +33,8 @@ const Navbar = () => {
   }, []);
 
   const isHome = location.pathname === '/' || location.pathname === `/${citySlug}`;
-  
-  const standardRoutes = ['products', 'about', 'contact', 'blog', 'pricing', 'dashboards', 'features', 'industries', 'privacy-policy', 'terms-conditions', 'shipping-policy', 'sitemap', 'admin'];
+
+  const standardRoutes = ['products', 'special-product', 'special-products', 'about', 'contact', 'blog', 'pricing', 'dashboards', 'features', 'industries', 'privacy-policy', 'terms-conditions', 'shipping-policy', 'sitemap', 'admin'];
   const parts = location.pathname.split('/').filter(Boolean);
   let isCustomPage = false;
   if (parts.length === 1 && !standardRoutes.includes(parts[0])) {
@@ -43,7 +43,7 @@ const Navbar = () => {
     isCustomPage = true;
   }
 
-  const isTransparent = (isHome || isCustomPage) && !scrolled;
+  const isTransparent = false;
 
   const [dbCategories, setDbCategories] = useState(() => cachedNavCategories || []);
   const [dbProducts, setDbProducts] = useState(() => cachedNavProducts || []);
@@ -86,6 +86,7 @@ const Navbar = () => {
 
   const getPath = (basePath) => {
     if (!isLocationRoute) return basePath;
+    if (basePath === '/special-product' || basePath === '/special-products') return basePath;
     if (basePath === '/') return `/${citySlug}`;
     return `/${citySlug}${basePath}`;
   };
@@ -145,9 +146,8 @@ const Navbar = () => {
                           >
                             <Link
                               to={`${getPath('/products')}?category=${category.slug}`}
-                              className={`flex items-center justify-between px-5 py-3 text-[14px] font-bold transition-colors ${
-                                isHovered ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
-                              }`}
+                              className={`flex items-center justify-between px-5 py-3 text-[14px] font-bold transition-colors ${isHovered ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                                }`}
                             >
                               <span className="truncate pr-2">{category.name}</span>
                               {categoryProds.length > 0 && (
@@ -201,10 +201,9 @@ const Navbar = () => {
                             className="relative"
                           >
                             <Link
-                              to={`${getPath('/products')}?category=${category.slug}`}
-                              className={`flex items-center justify-between px-5 py-3 text-[14px] font-bold transition-colors ${
-                                isHovered ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
-                              }`}
+                              to={`/special-product?category=${category.slug}`}
+                              className={`flex items-center justify-between px-5 py-3 text-[14px] font-bold transition-colors ${isHovered ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                                }`}
                             >
                               <span className="truncate pr-2">{category.name}</span>
                               <ChevronRight className={`w-4 h-4 shrink-0 transition-colors ${isHovered ? 'text-blue-600' : 'text-gray-400'}`} />
@@ -328,7 +327,10 @@ const Navbar = () => {
                         if (link.name === 'Products' && categoryProds.length === 0) return null;
                         return (
                           <div key={category._id} className="flex flex-col gap-2">
-                            <Link to={`${getPath('/products')}?category=${category.slug}`} className="font-bold text-[14px] text-gray-800 hover:text-blue-600">
+                            <Link 
+                              to={link.name === 'Special Product' ? `/special-product?category=${category.slug}` : `${getPath('/products')}?category=${category.slug}`} 
+                              className="font-bold text-[14px] text-gray-800 hover:text-blue-600"
+                            >
                               {category.name}
                             </Link>
                             <div className="flex flex-col pl-3 gap-2.5 mt-1 border-l border-gray-100">

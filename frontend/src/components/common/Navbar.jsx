@@ -39,7 +39,7 @@ const Navbar = () => {
     isCustomPage = true;
   }
 
-  const isTransparent = (isHome || isCustomPage) && !scrolled;
+  const isTransparent = false;
 
   const [dbCategories, setDbCategories] = useState([]);
   const [dbProducts, setDbProducts] = useState([]);
@@ -78,6 +78,7 @@ const Navbar = () => {
 
   const getPath = (basePath) => {
     if (!isLocationRoute) return basePath;
+    if (basePath === '/special-product' || basePath === '/special-products') return basePath;
     if (basePath === '/') return `/${citySlug}`;
     return `/${citySlug}${basePath}`;
   };
@@ -193,7 +194,7 @@ const Navbar = () => {
                             className="relative"
                           >
                             <Link
-                              to={`${getPath('/products')}?category=${category.slug}`}
+                              to={`/special-product?category=${category.slug}`}
                               className={`flex items-center justify-between px-5 py-3 text-[14px] font-bold transition-colors ${
                                 isHovered ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
                               }`}
@@ -320,7 +321,10 @@ const Navbar = () => {
                         if (link.name === 'Products' && categoryProds.length === 0) return null;
                         return (
                           <div key={category._id} className="flex flex-col gap-2">
-                            <Link to={`${getPath('/products')}?category=${category.slug}`} className="font-bold text-[14px] text-gray-800 hover:text-blue-600">
+                            <Link 
+                              to={link.name === 'Special Product' ? `/special-product?category=${category.slug}` : `${getPath('/products')}?category=${category.slug}`} 
+                              className="font-bold text-[14px] text-gray-800 hover:text-blue-600"
+                            >
                               {category.name}
                             </Link>
                             <div className="flex flex-col pl-3 gap-2.5 mt-1 border-l border-gray-100">

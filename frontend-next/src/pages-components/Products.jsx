@@ -1,15 +1,23 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from '@/compat/react-router';
+import { Link, useLocation, useNavigate } from '@/compat/react-router';
 import { 
   Search, ChevronDown, Grid, List, Bookmark, 
   CheckCircle2, ShieldCheck, Truck, Headset, Settings
 } from 'lucide-react';
 import apiClient from '../api/client';
 
-export default function Products() {
+export default function Products({ isSpecialOnly = false }) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
-  const [activeCategory, setActiveCategory] = useState('All Products');
+  const isSpecial = Boolean(
+    isSpecialOnly || 
+    (typeof window !== 'undefined' && window.location.pathname.includes('special-product')) || 
+    new URLSearchParams(location.search).get('special') === 'true'
+  );
+  const defaultCategoryTitle = isSpecial ? 'All Special Products' : 'All Products';
+  const [activeCategory, setActiveCategory] = useState(defaultCategoryTitle);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 6;
@@ -17,8 +25,6 @@ export default function Products() {
   const [dbCategories, setDbCategories] = useState([]);
   const [dbProducts, setDbProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const location = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -42,6 +48,8 @@ export default function Products() {
           if (matchedCat) {
             setActiveCategory(matchedCat.name);
           }
+        } else {
+          setActiveCategory(defaultCategoryTitle);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -50,22 +58,26 @@ export default function Products() {
       }
     };
     fetchData();
-  }, [location.search]);
+  }, [location.search, isSpecial, defaultCategoryTitle]);
 
   // Reset to first page on filter change
   useEffect(() => {
     setCurrentPage(1);
   }, [activeCategory, searchQuery]);
 
+  const availableProducts = isSpecial ? dbProducts.filter(p => Boolean(p.isSpecial)) : dbProducts;
+
   const categories = [
-    { name: 'All Products', count: dbProducts.length },
-    ...dbCategories.map(cat => ({
-      name: cat.name,
-      count: dbProducts.filter(p => p.category?._id === cat._id).length
-    }))
+    { name: defaultCategoryTitle, count: availableProducts.length },
+    ...dbCategories
+      .filter(cat => !isSpecial || availableProducts.some(p => p.category?._id === cat._id))
+      .map(cat => ({
+        name: cat.name,
+        count: availableProducts.filter(p => p.category?._id === cat._id).length
+      }))
   ];
 
-  const productsList = dbProducts.map(p => ({
+  const productsList = availableProducts.map(p => ({
     ...p,
     categoryName: p.category?.name?.toUpperCase() || 'N/A',
     image: p.images && p.images.length > 0 ? p.images[0] : '',
@@ -73,7 +85,8 @@ export default function Products() {
   }));
 
   const filteredProducts = productsList.filter(product => {
-    const matchesCategory = activeCategory === 'All Products' || (product.category?.name && product.category.name.toLowerCase() === activeCategory.toLowerCase());
+    const isAll = activeCategory === 'All Products' || activeCategory === 'All Special Products';
+    const matchesCategory = isAll || (product.category?.name && product.category.name.toLowerCase() === activeCategory.toLowerCase());
     const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) || product.desc.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -98,12 +111,16 @@ export default function Products() {
           <div className="flex items-center gap-2 text-[13px] font-semibold text-gray-500 mb-4">
             <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
             <span>›</span>
-            <span className="text-gray-800">All Products</span>
+            <span className="text-gray-800">{isSpecial ? 'Special Products' : 'All Products'}</span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">All Products</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+            {isSpecial ? 'Special Products' : 'All Products'}
+          </h1>
           <p className="text-gray-600 font-medium text-[16px] max-w-3xl leading-relaxed">
-            Explore our complete range of precision-engineered products for the printing, packaging, and quality control industry.
+            {isSpecial 
+              ? 'Explore our exclusive range of high-performance special products designed for precision and extreme durability.'
+              : 'Explore our complete range of precision-engineered products for the printing, packaging, and quality control industry.'}
           </p>
         </div>
 
@@ -226,10 +243,17 @@ export default function Products() {
             {/* Product Grid */}
             <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
               {currentProducts.map((product, idx) => (
-                <div key={idx} className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-[#1e3a8a]/40 transition-all duration-300 group ${viewMode === 'list' ? 'flex items-center gap-4' : 'flex flex-col'}`}>
+                <div 
+                  key={idx} 
+                  onClick={() => navigate(`/products/${product.slug}`)}
+                  className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#1e3a8a]/40 transition-all duration-300 group cursor-pointer ${viewMode === 'list' ? 'flex items-center gap-4' : 'flex flex-col'}`}
+                >
                   
                   {/* Image Container */}
-                  <div className={`relative bg-gray-50 border-b border-gray-200 flex items-center justify-center p-1 sm:p-2 ${viewMode === 'list' ? 'w-48 h-48 shrink-0' : 'w-full h-56 sm:h-64'}`}>
+                  <Link 
+                    to={`/products/${product.slug}`}
+                    className={`relative bg-gray-50 border-b border-gray-200 flex items-center justify-center p-1 sm:p-2 ${viewMode === 'list' ? 'w-48 h-48 shrink-0' : 'w-full h-56 sm:h-64'}`}
+                  >
                     <img 
                       src={product.image} 
                       alt={product.title} 
@@ -241,10 +265,21 @@ export default function Products() {
                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjVmOSIgLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5NDkzYjgiIGR5PSIuM2VtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4='; // Simple gray SVG placeholder fallback
                       }}
                     />
-                    <button className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-md flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors shadow-sm">
+                    {product.isSpecial && (
+                      <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider bg-orange-500 text-white shadow-sm uppercase z-10">
+                        Special
+                      </span>
+                    )}
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-md flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors shadow-sm z-10"
+                    >
                       <Bookmark className="w-4 h-4" />
                     </button>
-                  </div>
+                  </Link>
 
                   {/* Content */}
                   <div className={`p-5 flex flex-col flex-grow ${viewMode === 'list' ? 'justify-center' : ''}`}>
@@ -252,7 +287,9 @@ export default function Products() {
                       {product.categoryName}
                     </span>
                     <h3 className="text-[17px] font-black text-black mb-2 leading-tight group-hover:text-[#1e3a8a] transition-colors">
-                      {product.title}
+                      <Link to={`/products/${product.slug}`} className="hover:text-[#1e3a8a]">
+                        {product.title}
+                      </Link>
                     </h3>
                     <p className="text-gray-800 text-[13.5px] font-medium leading-relaxed mb-5 flex-grow line-clamp-2">
                       {product.desc}
@@ -260,11 +297,19 @@ export default function Products() {
                     
                     {/* Buttons */}
                     <div className="flex items-center gap-2 mt-auto">
-                      <Link to={`/products/${product.slug}`} className="flex-1 text-center py-2 rounded-lg border-2 border-gray-300 text-gray-800 font-bold text-[12px] hover:bg-gray-100 hover:border-gray-400 hover:text-black transition-all">
+                      <Link 
+                        to={`/products/${product.slug}`} 
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex-1 text-center py-2 rounded-lg border-2 border-gray-300 text-gray-800 font-bold text-[12px] hover:bg-gray-100 hover:border-gray-400 hover:text-black transition-all"
+                      >
                         VIEW DETAILS
                       </Link>
                       <button 
-                        onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.dispatchEvent(new Event('open-quote-modal'));
+                        }}
                         className="flex-1 text-center py-2 rounded-lg bg-[#1e3a8a] text-white font-bold text-[12px] hover:bg-[#152960] transition-all"
                       >
                         GET A QUOTE
@@ -273,6 +318,12 @@ export default function Products() {
                   </div>
                 </div>
               ))}
+              {currentProducts.length === 0 && (
+                <div className="col-span-full py-16 px-4 text-center bg-white rounded-xl border border-gray-200 shadow-sm">
+                  <p className="text-gray-800 font-bold text-lg mb-2">No products found</p>
+                  <p className="text-gray-500 text-sm">There are no products matching your selected category or search filter.</p>
+                </div>
+              )}
             </div>
 
             {/* Pagination */}

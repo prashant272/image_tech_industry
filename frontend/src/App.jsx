@@ -79,6 +79,8 @@ function App() {
           <Route path="/industries/:slug" element={<IndustryDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/special-product" element={<Products isSpecialOnly={true} />} />
+          <Route path="/special-products" element={<Products isSpecialOnly={true} />} />
           <Route path="/products/:slug" element={<ProductDetail />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />

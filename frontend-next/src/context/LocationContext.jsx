@@ -9,7 +9,7 @@ const LocationContext = createContext();
 let memoryLocations = null;
 
 const standardRoutes = [
-  'about', 'products', 'blog', 'pricing', 'contact', 'industries', 
+  'about', 'products', 'special-product', 'special-products', 'blog', 'pricing', 'contact', 'industries', 
   'features', 'dashboards', 'privacy-policy', 'terms-conditions', 
   'shipping-policy', 'sitemap', 'admin'
 ];
@@ -68,18 +68,27 @@ export const LocationProvider = ({ children, initialLocations = [] }) => {
     const pathSegment = currentSegments[0];
 
     if (pathSegment && !standardRoutes.includes(pathSegment)) {
-      setIsLocationRoute(true);
-      setCurrentCitySlug(pathSegment);
-
       if (locations.length > 0) {
         const foundLocation = locations.find(loc => loc.slug === pathSegment);
         if (foundLocation) {
+          setIsLocationRoute(true);
+          setCurrentCitySlug(pathSegment);
           setCurrentCityName(foundLocation.name);
           setCurrentCityState(foundLocation.state || foundLocation.name);
+          return;
+        } else {
+          // If locations are loaded and this pathSegment is NOT a valid location slug,
+          // it must not be treated as a location route.
+          setIsLocationRoute(false);
+          setCurrentCityName('Delhi');
+          setCurrentCitySlug('delhi');
+          setCurrentCityState('Delhi');
           return;
         }
       }
       
+      setIsLocationRoute(true);
+      setCurrentCitySlug(pathSegment);
       const formatted = pathSegment.charAt(0).toUpperCase() + pathSegment.slice(1);
       setCurrentCityName(formatted);
       setCurrentCityState(formatted);

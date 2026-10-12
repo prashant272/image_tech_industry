@@ -36,8 +36,8 @@ const StatsBanner = () => {
   ];
 
   return (
-    <div className="relative z-30 mt-8 md:-mt-10 px-4 sm:px-6 lg:px-8 max-w-[95rem] mx-auto w-full">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
+    <section className="w-full bg-white border-y border-gray-100 shadow-sm py-6 md:py-8">
+      <div className="w-full max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 divide-x-0 lg:divide-x lg:divide-gray-100">
           {stats.map((stat, index) => (
             <div key={index} className={`flex flex-col items-center text-center ${index !== 0 ? 'lg:pl-4' : ''}`}>
@@ -54,7 +54,7 @@ const StatsBanner = () => {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

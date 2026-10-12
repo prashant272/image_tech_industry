@@ -10,6 +10,7 @@ const Footer = () => {
 
   const getPath = (basePath) => {
     if (!isLocationRoute) return basePath;
+    if (basePath === '/special-product' || basePath === '/special-products') return basePath;
     if (basePath === '/') return `/${citySlug}`;
     return `/${citySlug}${basePath}`;
   };
