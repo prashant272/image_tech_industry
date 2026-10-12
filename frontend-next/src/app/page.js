@@ -1,21 +1,20 @@
 import Home from '@/pages-components/Home';
-import { buildPageMetadata, homepageJsonLd } from '@/lib/seo';
+import { homepageJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
+import { getFeaturedProducts } from '@/lib/products';
 
-export const metadata = buildPageMetadata({
-  title: "Printing & Packaging Machinery Accessories Manufacturer, Supplier & Exporter",
-  description:
-    "Leading manufacturer, supplier and global exporter of high-precision printing, packaging, and lamination machinery accessories — doctor blades, ink mixing rollers, wire bar coaters, dyne test pens, slitting blades and testing equipment.",
-  path: "/",
-});
+export const metadata = {
+  alternates: { canonical: "/" },
+};
 
-export default function HomePage() {
+export default async function HomePage() {
   const schema = homepageJsonLd();
+  const products = await getFeaturedProducts();
 
   return (
     <>
       <JsonLd data={schema} />
-      <Home />
+      <Home products={products} />
     </>
   );
 }

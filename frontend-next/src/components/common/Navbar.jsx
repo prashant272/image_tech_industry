@@ -15,11 +15,15 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openMobileDropdown, setOpenMobileDropdown] = useState(null);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [hoveredSpecialCategory, setHoveredSpecialCategory] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setOpenMobileDropdown(null);
+    setHoveredCategory(null);
+    setHoveredSpecialCategory(null);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -124,69 +128,113 @@ const Navbar = () => {
                 )}
 
                 {link.hasDropdown && link.name === 'Products' && (
-                  <div className="absolute top-full left-0 mt-4 w-64 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                    {dbCategories.map(category => {
-                      const categoryProds = getProductsByCategory(category._id);
-                      return (
-                        <div key={category._id} className="relative group/cat">
-                          <Link
-                            to={`${getPath('/products')}?category=${category.slug}`}
-                            className="flex items-center justify-between px-5 py-3 text-[14px] font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                  <div
+                    onMouseLeave={() => setHoveredCategory(null)}
+                    className="absolute top-full left-0 mt-4 flex bg-white border border-gray-100 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden"
+                  >
+                    {/* Categories List (Max 80% viewport height with scrollbar) */}
+                    <div className="w-64 max-h-[80vh] overflow-y-auto py-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
+                      {dbCategories.map(category => {
+                        const categoryProds = getProductsByCategory(category._id);
+                        const isHovered = hoveredCategory === category._id;
+                        return (
+                          <div
+                            key={category._id}
+                            onMouseEnter={() => setHoveredCategory(category._id)}
+                            className="relative"
                           >
-                            {category.name}
-                            <ChevronRight className="w-4 h-4 text-gray-400 group-hover/cat:text-blue-600" />
-                          </Link>
+                            <Link
+                              to={`${getPath('/products')}?category=${category.slug}`}
+                              className={`flex items-center justify-between px-5 py-3 text-[14px] font-bold transition-colors ${
+                                isHovered ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                              }`}
+                            >
+                              <span className="truncate pr-2">{category.name}</span>
+                              {categoryProds.length > 0 && (
+                                <ChevronRight className={`w-4 h-4 shrink-0 transition-colors ${isHovered ? 'text-blue-600' : 'text-gray-400'}`} />
+                              )}
+                            </Link>
+                          </div>
+                        );
+                      })}
+                    </div>
 
-                          {/* Secondary Flyout for Products */}
-                          {categoryProds.length > 0 && (
-                            <div className="absolute top-0 left-[100%] w-72 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover/cat:opacity-100 group-hover/cat:visible transition-all duration-200 ml-1">
-                              {categoryProds.map(p => (
-                                <Link
-                                  key={p._id}
-                                  to={getPath(`/products/${p.slug}`)}
-                                  className="block px-5 py-3 text-[13.5px] font-bold text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-6 transition-all"
-                                >
-                                  {p.title}
-                                </Link>
-                              ))}
-                            </div>
-                          )}
+                    {/* Secondary Flyout for Products */}
+                    {(() => {
+                      const activeProds = hoveredCategory ? getProductsByCategory(hoveredCategory) : [];
+                      if (!activeProds || activeProds.length === 0) return null;
+                      return (
+                        <div className="w-72 max-h-[80vh] overflow-y-auto py-2 border-l border-gray-100 bg-gray-50/70 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
+                          <div className="px-5 py-2 text-[11px] font-black text-gray-400 tracking-wider uppercase">
+                            Products
+                          </div>
+                          {activeProds.map(p => (
+                            <Link
+                              key={p._id}
+                              to={getPath(`/products/${p.slug}`)}
+                              className="block px-5 py-2.5 text-[13.5px] font-semibold text-gray-600 hover:bg-white hover:text-blue-600 hover:pl-6 transition-all"
+                            >
+                              {p.title}
+                            </Link>
+                          ))}
                         </div>
-                      )
-                    })}
+                      );
+                    })()}
                   </div>
                 )}
 
                 {link.hasDropdown && link.name === 'Special Product' && (
-                  <div className="absolute top-full left-0 mt-4 w-64 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                    {dbCategories.map(category => {
-                      const specialProds = getProductsByCategory(category._id, true);
-                      if (specialProds.length === 0) return null;
-                      return (
-                        <div key={category._id} className="relative group/cat">
-                          <Link
-                            to={`${getPath('/products')}?category=${category.slug}`}
-                            className="flex items-center justify-between px-5 py-3 text-[14px] font-bold text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                  <div
+                    onMouseLeave={() => setHoveredSpecialCategory(null)}
+                    className="absolute top-full left-0 mt-4 flex bg-white border border-gray-100 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden"
+                  >
+                    {/* Special Categories List (Max 80% viewport height with scrollbar) */}
+                    <div className="w-64 max-h-[80vh] overflow-y-auto py-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
+                      {dbCategories.map(category => {
+                        const specialProds = getProductsByCategory(category._id, true);
+                        if (specialProds.length === 0) return null;
+                        const isHovered = hoveredSpecialCategory === category._id;
+                        return (
+                          <div
+                            key={category._id}
+                            onMouseEnter={() => setHoveredSpecialCategory(category._id)}
+                            className="relative"
                           >
-                            {category.name}
-                            <ChevronRight className="w-4 h-4 text-gray-400 group-hover/cat:text-blue-600" />
-                          </Link>
-
-                          {/* Secondary Flyout for Products */}
-                          <div className="absolute top-0 left-[100%] w-72 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover/cat:opacity-100 group-hover/cat:visible transition-all duration-200 ml-1">
-                            {specialProds.map(p => (
-                              <Link
-                                key={p._id}
-                                to={getPath(`/products/${p.slug}`)}
-                                className="block px-5 py-3 text-[13.5px] font-bold text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-6 transition-all"
-                              >
-                                {p.title}
-                              </Link>
-                            ))}
+                            <Link
+                              to={`${getPath('/products')}?category=${category.slug}`}
+                              className={`flex items-center justify-between px-5 py-3 text-[14px] font-bold transition-colors ${
+                                isHovered ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                              }`}
+                            >
+                              <span className="truncate pr-2">{category.name}</span>
+                              <ChevronRight className={`w-4 h-4 shrink-0 transition-colors ${isHovered ? 'text-blue-600' : 'text-gray-400'}`} />
+                            </Link>
                           </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Secondary Flyout for Special Products */}
+                    {(() => {
+                      const activeProds = hoveredSpecialCategory ? getProductsByCategory(hoveredSpecialCategory, true) : [];
+                      if (!activeProds || activeProds.length === 0) return null;
+                      return (
+                        <div className="w-72 max-h-[80vh] overflow-y-auto py-2 border-l border-gray-100 bg-gray-50/70 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
+                          <div className="px-5 py-2 text-[11px] font-black text-gray-400 tracking-wider uppercase">
+                            Special Products
+                          </div>
+                          {activeProds.map(p => (
+                            <Link
+                              key={p._id}
+                              to={getPath(`/products/${p.slug}`)}
+                              className="block px-5 py-2.5 text-[13.5px] font-semibold text-gray-600 hover:bg-white hover:text-blue-600 hover:pl-6 transition-all"
+                            >
+                              {p.title}
+                            </Link>
+                          ))}
                         </div>
-                      )
-                    })}
+                      );
+                    })()}
                   </div>
                 )}
               </div>

@@ -138,7 +138,8 @@ const Hero = () => {
   const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
 
   return (
-    <div className="relative w-full h-[100dvh] md:h-[600px] lg:h-[750px] bg-[#000000] overflow-hidden group">
+    <div className="relative w-full h-[100dvh] md:h-[600px] lg:h-[750px] bg-white overflow-hidden group">
+      <h1 className="sr-only">Doctor Blades & Printing Machinery Accessories</h1>
       {/* Slides Container */}
       <div
         className="w-full h-full flex transition-transform duration-700 ease-in-out"
@@ -149,14 +150,14 @@ const Hero = () => {
             <img
               src={slide.image}
               alt={slide.title1 + ' ' + slide.titleHighlight}
-              className="absolute inset-0 w-full h-full object-cover object-[center_30%] z-0"
+              className="absolute inset-x-0 bottom-0 top-16 md:top-20 lg:top-24 w-full h-[calc(100%-4rem)] md:h-[calc(100%-5rem)] lg:h-[calc(100%-6rem)] object-cover object-top z-0"
               fetchPriority={index === 0 ? "high" : "auto"}
               decoding={index === 0 ? "sync" : "async"}
             />
             {/* Gradient Overlay for Text Readability - Desktop Only now */}
-            <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-white/90 via-white/50 to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute inset-x-0 bottom-0 top-16 md:top-20 lg:top-24 hidden md:block bg-gradient-to-r from-white/95 via-white/60 to-transparent z-10 pointer-events-none"></div>
 
-            <div className="max-w-[85rem] w-full mx-auto px-4 sm:px-6 lg:px-8 relative z-20 h-full flex items-center md:items-center justify-center md:justify-start">
+            <div className="max-w-[85rem] w-full mx-auto px-4 sm:px-6 lg:px-8 relative z-20 h-full flex items-center md:items-center justify-center md:justify-start pt-14 md:pt-16 lg:pt-20">
               <div className="relative w-full md:w-[60%] lg:w-[45%] bg-white/10 md:bg-transparent backdrop-blur-none p-6 sm:p-8 md:p-0 rounded-[2rem] md:rounded-none shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] md:shadow-none border border-white/40 md:border-none mt-8 md:mt-24 lg:mt-0 flex flex-col">
                 <div className="flex items-center gap-2 mb-2 md:mb-1.5">
                   <div className="w-0.5 h-3 md:h-4" style={{ backgroundColor: slide.themeColor }}></div>
@@ -165,13 +166,13 @@ const Hero = () => {
                   </span>
                 </div>
 
-                <h1 className={`${slide.textColor} font-black leading-[1.1] mb-2 md:mb-4 drop-shadow-sm md:drop-shadow-none`}>
+                <h2 className={`${slide.textColor} font-black leading-[1.1] mb-2 md:mb-4 drop-shadow-sm md:drop-shadow-none`}>
                   <span className="block text-3xl md:text-4xl lg:text-6xl tracking-tight drop-shadow-md">{slide.title1}</span>
                   <span className="block text-4xl md:text-5xl lg:text-7xl mt-0 md:mt-1 tracking-tighter drop-shadow-md" style={{ color: slide.themeColor, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
                     {slide.titleHighlight}
                   </span>
                   {slide.title2 && <span className={slide.id === 3 ? "text-2xl md:text-3xl lg:text-4xl drop-shadow-md mt-0 md:mt-1" : "drop-shadow-md text-base md:text-lg"}>{slide.title2}</span>}
-                </h1>
+                </h2>
 
                 <div className={`text-xs md:text-sm font-bold tracking-widest uppercase mb-1 md:mb-2 opacity-100 text-orange-400 drop-shadow-lg`}>
                   {slide.subtitle}

@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from '@/compat/react-router';
 import {
   CheckCircle2, Settings, Layout, Maximize, Truck, Target, Shield, Activity,
-  Plus, Minus, ArrowRight, ArrowLeft
+  Plus, Minus, ArrowRight, ArrowLeft, MapPin
 } from 'lucide-react';
 import CTA from '../components/home/CTA';
 import apiClient from '../api/client';
 import NotFound from '@/app/not-found';
+import { useLocationContext } from '../context/LocationContext';
 
 const IconMap = {
   Settings: <Settings className="w-5 h-5" />,
@@ -19,11 +20,17 @@ const IconMap = {
   Activity: <Activity className="w-6 h-6 text-blue-600" />
 };
 
-export default function ProductDetail() {
+export default function ProductDetail({ initialProduct = null, locationData = null, isLocationPseo = false }) {
   const { slug } = useParams();
-  const [product, setProduct] = useState(null);
+  const locationCtx = useLocationContext();
+
+  const activeCityName = locationData?.name || (locationCtx.isLocationRoute ? locationCtx.cityName : null);
+  const activeStateName = locationData?.state || (locationCtx.isLocationRoute ? locationCtx.stateName : null);
+  const isCityPage = Boolean(isLocationPseo || (locationCtx.isLocationRoute && locationCtx.cityName));
+
+  const [product, setProduct] = useState(initialProduct);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialProduct);
 
   const [activeImage, setActiveImage] = useState(0);
   const [activeTab, setActiveTab] = useState('overview');
@@ -42,14 +49,29 @@ export default function ProductDetail() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    // If initialProduct was already supplied via server-side rendering, just load related products
     const fetchProductDetails = async () => {
       try {
-        setLoading(true);
-        // Fetch all products to get related products as well
+        if (!product) {
+          setLoading(true);
+        }
         const response = await apiClient.get('/products');
-        const allProducts = response.data;
-        const currentProduct = allProducts.find(p => p.slug === slug);
-        setProduct(currentProduct);
+        const allProducts = response.data || [];
+
+        let currentProduct = product;
+        if (!currentProduct) {
+          // Check direct slug match
+          currentProduct = allProducts.find(p => p.slug === slug);
+
+          // If slug contains -in-, extract base product slug
+          if (!currentProduct && slug && slug.includes('-in-')) {
+            const baseSlug = slug.slice(0, slug.lastIndexOf('-in-'));
+            currentProduct = allProducts.find(p => p.slug === baseSlug);
+          }
+          setProduct(currentProduct || null);
+        }
+
         if (currentProduct) {
           setRelatedProducts(allProducts.filter(p => p._id !== currentProduct._id).slice(0, 5));
         }
@@ -59,6 +81,7 @@ export default function ProductDetail() {
         setLoading(false);
       }
     };
+
     fetchProductDetails();
   }, [slug]);
 
@@ -69,32 +92,13 @@ export default function ProductDetail() {
   if (!product) {
     return <NotFound />;
   }
-  if (false) {
-    return (
-      <div className="pt-32 pb-20 text-center min-h-screen">
-        <h2 className="text-2xl font-bold mb-4">Product not found</h2>
-        <Link to="/products" className="text-blue-600 hover:underline">Return to Products</Link>
-      </div>
-    );
-  }
+
+  const displayTitle = isCityPage && activeCityName
+    ? `${product.title} in ${activeCityName}`
+    : product.title;
 
   return (
     <div className="pt-24 pb-0 bg-[#f8f9fa] min-h-screen font-sans text-gray-900">
-      {/* Native React 19 Document Head tags */}
-      <title>{product.seoTitle || `${product.title} | Imagetech Industries`}</title>
-      <meta name="description" content={product.seoDescription || product.shortDesc} />
-      {product.seoKeywords && <meta name="keywords" content={product.seoKeywords} />}
-
-      {/* Open Graph Tags for Social Sharing */}
-      <meta property="og:title" content={product.seoTitle || product.title} />
-      <meta property="og:description" content={product.seoDescription || product.shortDesc} />
-      {product.images?.length > 0 && <meta property="og:image" content={product.images[0]} />}
-      <meta property="og:type" content="product" />
-      <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
-
-      {/* Canonical Link */}
-      <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
-
       <div className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Breadcrumb */}
@@ -103,6 +107,12 @@ export default function ProductDetail() {
           <span>›</span>
           <Link to="/products" className="hover:text-blue-600 transition-colors">Products</Link>
           <span>›</span>
+          {isCityPage && activeCityName && (
+            <>
+              <span className="text-blue-600">{activeCityName}</span>
+              <span>›</span>
+            </>
+          )}
           <span className="text-gray-800">{product.category?.name || 'Category'}</span>
           <span>›</span>
           <span className="text-gray-800">{product.title}</span>
@@ -115,7 +125,7 @@ export default function ProductDetail() {
           <div className="w-full lg:w-1/2 flex flex-col-reverse md:flex-row gap-4 md:h-[500px] lg:sticky lg:top-32">
             {/* Thumbnails */}
             <div className="flex flex-row md:flex-col gap-3 md:w-20 shrink-0 overflow-x-auto md:overflow-y-auto hide-scrollbar pb-2 md:pb-0">
-              {product.images.map((img, idx) => (
+              {(product.images || []).map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImage(idx)}
@@ -133,8 +143,8 @@ export default function ProductDetail() {
               onMouseMove={handleMouseMove}
             >
               <img
-                src={product.images[activeImage]}
-                alt={product.title}
+                src={product.images && product.images[activeImage] ? product.images[activeImage] : '/images/logo.png'}
+                alt={displayTitle}
                 className={`w-full h-full object-contain transition-transform duration-200 ease-out`}
                 style={{
                   transform: isZooming ? 'scale(2.5)' : 'scale(1)',
@@ -146,15 +156,22 @@ export default function ProductDetail() {
 
           {/* Product Info */}
           <div className="w-full lg:w-1/2 flex flex-col">
-            <h1 className="text-[36px] font-black leading-tight text-[#0f172a] mb-4">
-              {product.title}
+            {isCityPage && activeCityName && (
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-[#1e3a8a] text-xs font-bold rounded-full w-max mb-3 uppercase tracking-wider">
+                <MapPin className="w-3.5 h-3.5" />
+                Available for dispatch to {activeCityName}{activeStateName ? `, ${activeStateName}` : ''}
+              </div>
+            )}
+
+            <h1 className="text-[32px] sm:text-[36px] font-black leading-tight text-[#0f172a] mb-4">
+              {displayTitle}
             </h1>
             <p className="text-base sm:text-[17px] font-medium text-gray-700 leading-relaxed mb-6">
               {product.shortDesc}
             </p>
 
             <ul className="space-y-3 mb-8">
-              {product.features.map((feature, idx) => (
+              {(product.features || []).map((feature, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-[15px] sm:text-base font-medium text-gray-800">{feature}</span>
@@ -166,14 +183,14 @@ export default function ProductDetail() {
             <div className="flex items-center gap-4 mb-10">
               <button
                 onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
-                className="bg-[#1e3a8a] text-white px-8 py-3.5 rounded-lg font-bold text-[13px] hover:bg-[#152960] transition-colors flex items-center gap-2 shadow-md"
+                className="bg-[#1e3a8a] text-white px-8 py-3.5 rounded-lg font-bold text-[13px] hover:bg-[#152960] transition-colors flex items-center gap-2 shadow-md cursor-pointer"
               >
                 <Layout className="w-4 h-4" />
                 REQUEST A QUOTE
                 <ArrowRight className="w-4 h-4" />
               </button>
               <a
-                href={`https://wa.me/918448336036?text=Hi, I am interested in your ${product.title}`}
+                href={`https://wa.me/918448336036?text=Hi, I am interested in ${displayTitle}`}
                 target="_blank" rel="noopener noreferrer"
                 className="bg-white border-2 border-green-500 text-green-600 px-8 py-3.5 rounded-lg font-bold text-[13px] hover:bg-green-50 transition-colors flex items-center gap-2 shadow-sm"
               >
@@ -183,12 +200,16 @@ export default function ProductDetail() {
 
             {/* Info Boxes */}
             <div className="flex flex-wrap gap-x-10 gap-y-6 mt-auto border-t border-gray-200 pt-8">
-              {product.infoBoxes.map((box, idx) => (
+              {(product.infoBoxes || []).map((box, idx) => (
                 <div key={idx} className="flex items-start gap-3">
                   <div className="text-orange-500 mt-0.5">{IconMap[box.icon] || <Settings className="w-5 h-5" />}</div>
                   <div>
                     <h5 className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1">{box.title}</h5>
-                    <p className="text-[14px] font-bold text-gray-900 leading-snug">{box.value}</p>
+                    <p className="text-[14px] font-bold text-gray-900 leading-snug">
+                      {box.title === 'Delivery' && isCityPage && activeCityName
+                        ? `Fast Delivery to ${activeCityName}`
+                        : box.value}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -203,7 +224,7 @@ export default function ProductDetail() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-8 py-4 text-[14px] font-black uppercase tracking-wider whitespace-nowrap transition-colors relative ${activeTab === tab ? 'text-[#1e3a8a]' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`px-8 py-4 text-[14px] font-black uppercase tracking-wider whitespace-nowrap transition-colors relative cursor-pointer ${activeTab === tab ? 'text-[#1e3a8a]' : 'text-gray-500 hover:text-gray-800'}`}
               >
                 {tab}
                 {activeTab === tab && (
@@ -233,131 +254,100 @@ export default function ProductDetail() {
                     <Shield className="w-8 h-8 text-blue-600 shrink-0" />
                     <div>
                       <h4 className="font-bold text-gray-900 text-[15px] mb-1">Quality Assured</h4>
-                      <p className="text-[13px] text-gray-600 font-medium">Every blade is manufactured and inspected to meet strict quality standards for consistent performance.</p>
+                      <p className="text-[13px] text-gray-600 font-medium">
+                        Every product is manufactured and inspected to meet strict industrial quality standards for high reliability{isCityPage && activeCityName ? ` in ${activeCityName}` : ''}.
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="w-full">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Key Features</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-                    {product.overviewFeatures.map((feat, idx) => (
-                      <div key={idx} className="flex gap-4">
-                        <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
-                          {IconMap[feat.icon] || <Target className="w-6 h-6 text-blue-600" />}
+                {product.overviewFeatures && product.overviewFeatures.length > 0 && (
+                  <div className="w-full">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Key Features</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                      {product.overviewFeatures.map((feat, idx) => (
+                        <div key={idx} className="flex gap-4">
+                          <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
+                            {IconMap[feat.icon] || <Target className="w-6 h-6 text-blue-600" />}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-[15px] text-gray-900 mb-1">{feat.title}</h4>
+                            <p className="text-[13px] text-gray-600 leading-relaxed">{feat.desc}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-bold text-[15px] text-gray-900 mb-1">{feat.title}</h4>
-                          <p className="text-[13px] font-medium text-gray-600 leading-relaxed">{feat.desc}</p>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
             {activeTab === 'specifications' && (
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Technical Specifications</h3>
-                <div className="overflow-hidden rounded-xl border border-gray-200">
-                  <table className="w-full text-left border-collapse">
-                    <tbody>
-                      {product.specifications.map((spec, idx) => (
-                        <tr key={idx} className="border-b border-gray-200 last:border-0 hover:bg-gray-50">
-                          <th className="py-4 px-6 text-[14px] font-bold text-gray-700 bg-gray-50/50 w-1/3">{spec.label}</th>
-                          <td className="py-4 px-6 text-[14px] font-medium text-gray-900">{spec.value}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                {product.specifications && product.specifications.length > 0 ? (
+                  <div className="border border-gray-200 rounded-xl overflow-hidden max-w-2xl">
+                    <table className="w-full text-left text-sm text-gray-600">
+                      <tbody>
+                        {product.specifications.map((spec, idx) => (
+                          <tr key={idx} className={idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                            <td className="px-6 py-4 font-bold text-gray-900 w-1/3 border-b border-gray-100">{spec.label}</td>
+                            <td className="px-6 py-4 border-b border-gray-100">{spec.value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-[15px] text-gray-400 italic">No specifications provided.</p>
+                )}
               </div>
             )}
           </div>
         </div>
 
-        {/* FAQ Section */}
-        {product.faqs && product.faqs.length > 0 && (
-          <div className="mb-20 flex flex-col lg:flex-row gap-6">
-            <div className="w-full lg:w-1/3 bg-[#0f172a] rounded-2xl p-10 text-white flex flex-col justify-center">
-              <h3 className="text-3xl font-black mb-4 leading-tight">Frequently Asked Questions</h3>
-              <p className="text-gray-300 font-medium text-[15px] mb-8">
-                Find answers to the most common questions about our {product.title}.
-              </p>
-              <Link to="/contact" className="inline-flex items-center gap-2 border border-white/30 hover:border-white text-white px-6 py-3 rounded-lg font-bold text-[13px] transition-colors self-start">
-                VIEW ALL FAQS
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="w-full lg:w-2/3 bg-white rounded-2xl border border-gray-200 p-2">
-              {product.faqs.map((faq, idx) => (
-                <div key={idx} className="border-b border-gray-100 last:border-0">
-                  <button
-                    onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-                    className="w-full flex items-center justify-between p-6 text-left focus:outline-none group"
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div className="mb-20">
+            <h3 className="text-2xl font-bold text-gray-900 mb-8">Related Products</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.slice(0, 4).map((rel) => {
+                const targetLink = isCityPage && activeCityName && locationData?.slug
+                  ? `/products/${rel.slug}-in-${locationData.slug}`
+                  : `/products/${rel.slug}`;
+                return (
+                  <Link
+                    key={rel._id}
+                    to={targetLink}
+                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group flex flex-col"
                   >
-                    <span className="font-bold text-[15px] text-gray-900 group-hover:text-blue-600 transition-colors">
-                      {faq.question}
-                    </span>
-                    <div className="shrink-0 ml-4 text-gray-400 group-hover:text-blue-600 transition-colors">
-                      {openFaqIndex === idx ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                    <div className="h-48 bg-gray-100 flex items-center justify-center p-4">
+                      <img
+                        src={rel.images && rel.images[0] ? rel.images[0] : '/images/logo.png'}
+                        alt={rel.title}
+                        className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform"
+                      />
                     </div>
-                  </button>
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ${openFaqIndex === idx ? 'max-h-40 pb-6 px-6 opacity-100' : 'max-h-0 opacity-0'}`}
-                  >
-                    <p className="text-[14px] font-medium text-gray-600 leading-relaxed">
-                      {faq.answer}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                    <div className="p-5 flex flex-col flex-grow">
+                      <h4 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-2">
+                        {rel.title}
+                      </h4>
+                      <p className="text-xs text-gray-500 line-clamp-2 mb-4 flex-grow">
+                        {rel.shortDesc}
+                      </p>
+                      <span className="text-xs font-bold text-blue-600 flex items-center gap-1 mt-auto">
+                        View Product <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}
 
-        {/* Related Products */}
-        <div className="mb-20">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-2xl font-black text-gray-900">Related Products</h3>
-            <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
-                <ArrowLeft className="w-4 h-4" />
-              </button>
-              <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {relatedProducts.map((p, idx) => (
-              <div key={p._id || p.id || p.slug || idx} className="bg-white rounded-xl border border-gray-200 overflow-hidden group hover:shadow-lg transition-shadow">
-                <div className="h-40 bg-gray-50 border-b border-gray-100 p-4">
-                  <img src={typeof p.images?.[0] === 'object' ? p.images[0].url : (p.images?.[0] || '/images/logo.png')} alt={p.title || p.name || 'Product'} loading="lazy" decoding="async" className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" />
-                </div>
-                <div className="p-4 flex flex-col h-[140px]">
-                  <h4 className="font-bold text-[14px] text-gray-900 leading-snug mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {p.title || p.name}
-                  </h4>
-                  <div className="mt-auto pt-4">
-                    <Link to={`/products/${p.slug}`} className="w-full bg-[#0f172a] hover:bg-blue-700 text-white py-2 rounded-lg text-[12px] font-bold transition-colors flex items-center justify-center gap-2">
-                      VIEW DETAILS
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
       </div>
-
-      {/* Reused Home Page CTA */}
       <CTA />
-
     </div>
   );
 }

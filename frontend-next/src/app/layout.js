@@ -3,9 +3,9 @@ import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from "@/lib/seo";
 
-const DEFAULT_TITLE = "ImageTech Industries | Printing & Packaging Machinery Accessories Manufacturer & Exporter";
+const DEFAULT_TITLE = "ImageTech Industries | Printing & Packaging Accessories";
 const DEFAULT_DESCRIPTION =
-  "Manufacturer, supplier and global exporter of high-precision printing, packaging, and lamination machinery accessories — doctor blades, ink mixing rollers, wire bar coaters, dyne test pens, slitting blades, stroboscopes and testing equipment. Worldwide export & B2B supply.";
+  "Manufacturer and supplier of doctor blades, dyne test pens, ink mixing rollers, stroboscopes and packaging machinery accessories based in Delhi, India.";
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),

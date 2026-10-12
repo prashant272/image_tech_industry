@@ -2,22 +2,11 @@ import { notFound } from 'next/navigation';
 import ProductDetail from '@/pages-components/ProductDetail';
 import { buildPageMetadata, productJsonLd, breadcrumbJsonLd } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
-
-async function getProduct(slug) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:5000/api';
-  try {
-    const res = await fetch(`${apiUrl}/products`, { next: { revalidate: 60 } });
-    if (!res.ok) return null;
-    const products = await res.json();
-    return products.find(p => p.slug === slug) || null;
-  } catch (err) {
-    return null;
-  }
-}
+import { resolveProductAndLocation } from '@/lib/productResolver';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const product = await getProduct(slug);
+  const { product, location, isLocationPseo } = await resolveProductAndLocation(slug);
 
   if (!product) {
     return buildPageMetadata({
@@ -28,12 +17,22 @@ export async function generateMetadata({ params }) {
     });
   }
 
-  const title = product.seoTitle || product.name || product.title;
-  const description =
-    product.seoDescription ||
-    product.shortDescription ||
-    product.description?.slice(0, 160) ||
-    `High-precision ${product.name} manufactured by ImageTech Industries for printing, coating and packaging applications.`;
+  const productName = product.seoTitle || product.name || product.title;
+  const cityName = location?.name;
+  const stateName = location?.state || cityName;
+
+  const title = isLocationPseo
+    ? `${productName} in ${cityName}, ${stateName} | ImageTech Industries`
+    : productName;
+
+  const description = isLocationPseo
+    ? `Buy ${productName} in ${cityName}, ${stateName} directly from manufacturer & supplier ImageTech Industries. Precision industrial supplies with fast delivery across ${stateName}.`
+    : (
+        product.seoDescription ||
+        product.shortDescription ||
+        product.description?.slice(0, 160) ||
+        `High-precision ${productName} manufactured by ImageTech Industries for printing, coating and packaging applications.`
+      );
 
   const ogImageUrl = product.images?.[0]?.url || (typeof product.images?.[0] === 'string' ? product.images[0] : null);
 
@@ -47,30 +46,42 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductDetailPage({ params }) {
   const { slug } = await params;
-  const product = await getProduct(slug);
+  const { product, location, isLocationPseo } = await resolveProductAndLocation(slug);
 
   if (!product) {
     notFound();
   }
 
+  const productName = product.name || product.title;
+  const cityName = location?.name;
+
   const pSchema = productJsonLd({
-    name: product.name || product.title,
+    name: isLocationPseo ? `${productName} in ${cityName}` : productName,
     description: product.description || product.shortDescription,
     path: `/products/${slug}`,
     images: product.images?.map(img => (typeof img === 'object' ? img.url : img)) || [],
     category: product.category?.name,
   });
 
-  const bSchema = breadcrumbJsonLd([
-    { name: "Home", path: "/" },
-    { name: "Products", path: "/products" },
-    { name: product.name || product.title, path: `/products/${slug}` },
-  ]);
+  const breadcrumbs = isLocationPseo
+    ? [
+        { name: "Home", path: "/" },
+        { name: "Products", path: "/products" },
+        { name: cityName, path: `/${location.slug}` },
+        { name: `${productName} in ${cityName}`, path: `/products/${slug}` },
+      ]
+    : [
+        { name: "Home", path: "/" },
+        { name: "Products", path: "/products" },
+        { name: productName, path: `/products/${slug}` },
+      ];
+
+  const bSchema = breadcrumbJsonLd(breadcrumbs);
 
   return (
     <>
       <JsonLd data={[pSchema, bSchema]} />
-      <ProductDetail />
+      <ProductDetail initialProduct={product} locationData={location} isLocationPseo={isLocationPseo} />
     </>
   );
 }

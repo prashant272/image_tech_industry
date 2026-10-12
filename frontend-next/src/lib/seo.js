@@ -1,7 +1,7 @@
 // Shared SEO configuration and helpers. Server-safe (no client-only code).
 
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://imagetechindustries.com"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.imagetechindustries.com"
 ).replace(/\/+$/, "");
 
 export const SITE_NAME = "ImageTech Industries";
