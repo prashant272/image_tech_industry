@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import NextLink from 'next/link';
-import { usePathname, useRouter, useParams as useNextParams } from 'next/navigation';
+import { usePathname, useRouter, useParams as useNextParams, useSearchParams } from 'next/navigation';
 
 export function Link({ to, href, children, ...props }) {
   const target = to || href || '#';
@@ -28,13 +28,8 @@ export function NavLink({ to, href, className, children, end, ...props }) {
 
 export function useLocation() {
   const pathname = usePathname() || '/';
-  const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setSearch(window.location.search || '');
-    }
-  }, [pathname]);
+  const searchParams = useSearchParams();
+  const search = searchParams ? (searchParams.toString() ? `?${searchParams.toString()}` : '') : '';
 
   return {
     pathname,

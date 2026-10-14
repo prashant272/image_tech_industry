@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Building2, Mail, Phone, Package, FileText, ShieldCheck, Send, CheckCircle2, Users, Truck, Globe, ChevronDown } from 'lucide-react';
 
+const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown after user closes popup
+
 export default function QuoteModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -10,54 +12,74 @@ export default function QuoteModal() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleClose = () => {
+    setIsOpen(false);
+    try {
+      localStorage.setItem('quoteModalClosedAt', Date.now().toString());
+    } catch (e) {}
+  };
+
   useEffect(() => {
     const handleOpen = () => setIsOpen(true);
     window.addEventListener('open-quote-modal', handleOpen);
-    try { localStorage.removeItem('quoteSubmitted'); } catch (e) {}
 
-    // Automatic Popup Logic for Lead Generation
-    let timer1, timer2, timer3;
-    let hasTriggeredScroll = false;
-    
-    const handleScroll = () => {
-      if (!hasTriggeredScroll && window.scrollY > 200) {
-        if (sessionStorage.getItem('quoteSubmitted') !== 'true') {
-          setIsOpen(true);
-          hasTriggeredScroll = true;
-          window.removeEventListener('scroll', handleScroll);
+    const canAutoShow = () => {
+      try {
+        if (
+          sessionStorage.getItem('quoteSubmitted') === 'true' ||
+          localStorage.getItem('quoteSubmitted') === 'true'
+        ) {
+          return false;
         }
+        const lastClosed = localStorage.getItem('quoteModalClosedAt');
+        if (lastClosed) {
+          const elapsed = Date.now() - Number(lastClosed);
+          if (elapsed < COOLDOWN_MS) {
+            return false;
+          }
+        }
+        return true;
+      } catch (e) {
+        return true;
       }
     };
 
-    // Only trigger if they haven't submitted the quote form already
-    if (sessionStorage.getItem('quoteSubmitted') !== 'true') {
-      // Trigger when user scrolls down
-      window.addEventListener('scroll', handleScroll);
+    // Auto-show on initial visit after 6 seconds
+    const timer = setTimeout(() => {
+      if (canAutoShow()) {
+        setIsOpen(true);
+      }
+    }, 6000);
 
-      // Show at 5 seconds
-      timer1 = setTimeout(() => {
-        if (sessionStorage.getItem('quoteSubmitted') !== 'true') setIsOpen(true);
-      }, 2500);
-      
-      // Show again at 2 minutes (120 seconds)
-      timer2 = setTimeout(() => {
-        if (sessionStorage.getItem('quoteSubmitted') !== 'true') setIsOpen(true);
-      }, 120 * 1000);
+    // Trigger on scroll if allowed and user hasn't closed it recently
+    let hasTriggeredScroll = false;
+    const handleScroll = () => {
+      if (!hasTriggeredScroll && window.scrollY > 300) {
+        hasTriggeredScroll = true;
+        if (canAutoShow()) {
+          setIsOpen(true);
+        }
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
-      // Show again at 5 minutes (300 seconds)
-      timer3 = setTimeout(() => {
-        if (sessionStorage.getItem('quoteSubmitted') !== 'true') setIsOpen(true);
-      }, 300 * 1000);
-    }
+    // After 5 minutes cooldown, check if modal can be shown again
+    const interval = setInterval(() => {
+      if (!isOpen && canAutoShow()) {
+        const lastClosed = localStorage.getItem('quoteModalClosedAt');
+        if (lastClosed && Date.now() - Number(lastClosed) >= COOLDOWN_MS) {
+          setIsOpen(true);
+        }
+      }
+    }, 15000);
 
     return () => {
       window.removeEventListener('open-quote-modal', handleOpen);
       window.removeEventListener('scroll', handleScroll);
-      if (timer1) clearTimeout(timer1);
-      if (timer2) clearTimeout(timer2);
-      if (timer3) clearTimeout(timer3);
+      if (timer) clearTimeout(timer);
+      if (interval) clearInterval(interval);
     };
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -84,6 +106,7 @@ export default function QuoteModal() {
       const res = await apiClient.post('/enquiry/submit', formData);
       if (res.data.success) {
         sessionStorage.setItem('quoteSubmitted', 'true');
+        localStorage.setItem('quoteSubmitted', 'true');
         alert("Thanks for your inquiry! We'll get back to you with a quote soon.");
         setFormData({ name: '', company: '', email: '', phone: '', subject: '', message: '', website: '' });
         setIsOpen(false);
@@ -101,7 +124,7 @@ export default function QuoteModal() {
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-[fadeIn_0.3s_ease-out]"
-        onClick={() => setIsOpen(false)}
+        onClick={handleClose}
       ></div>
 
       {/* Modal Container */}
@@ -109,7 +132,7 @@ export default function QuoteModal() {
         
         {/* Global Close Button */}
         <button
-          onClick={() => setIsOpen(false)}
+          onClick={handleClose}
           className="absolute top-4 right-4 md:top-6 md:right-6 text-slate-600 md:text-slate-400 hover:text-slate-800 bg-white/80 md:bg-slate-50 hover:bg-white md:hover:bg-slate-100 p-2.5 rounded-full transition-colors z-[110] shadow-sm md:shadow-none backdrop-blur-sm md:backdrop-blur-none"
         >
           <X size={20} />

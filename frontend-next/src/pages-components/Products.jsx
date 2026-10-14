@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from '@/compat/react-router';
 import { 
   Search, ChevronDown, ChevronRight, Layers, Grid, List, Bookmark, 
@@ -27,12 +27,8 @@ export default function Products({ isSpecialOnly = false }) {
   const [dbProducts, setDbProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 1. Fetch products & categories once on mount
   useEffect(() => {
-    window.scrollTo(0, 0);
-    const params = new URLSearchParams(location.search);
-    const categoryParam = params.get('category');
-    const subcategoryParam = params.get('subcategory');
-    
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -42,25 +38,11 @@ export default function Products({ isSpecialOnly = false }) {
           apiClient.get('/products')
         ]);
         
-        const fetchedCategories = catRes.data.filter(c => c.status === 'Active') || [];
-        const fetchedSubcategories = subRes.data.filter(s => s.status === 'Active') || [];
+        const fetchedCategories = (catRes.data || []).filter(c => c.status === 'Active');
+        const fetchedSubcategories = (subRes.data || []).filter(s => s.status === 'Active');
         setDbCategories(fetchedCategories);
         setDbSubcategories(fetchedSubcategories);
         setDbProducts(prodRes.data || []);
-        
-        if (subcategoryParam) {
-          const matchedSub = fetchedSubcategories.find(s => s.slug === subcategoryParam);
-          if (matchedSub) {
-            setActiveCategory(matchedSub.name);
-          }
-        } else if (categoryParam) {
-          const matchedCat = fetchedCategories.find(c => c.slug === categoryParam);
-          if (matchedCat) {
-            setActiveCategory(matchedCat.name);
-          }
-        } else {
-          setActiveCategory(defaultCategoryTitle);
-        }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -68,12 +50,68 @@ export default function Products({ isSpecialOnly = false }) {
       }
     };
     fetchData();
-  }, [location.search, isSpecial, defaultCategoryTitle]);
+  }, []);
+
+  // 2. Sync activeCategory IMMEDIATELY whenever URL query string changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const params = new URLSearchParams(location.search);
+    const categoryParam = params.get('category');
+    const subcategoryParam = params.get('subcategory');
+
+    if (subcategoryParam) {
+      const targetSub = subcategoryParam.toLowerCase().trim();
+      const matchedSub = dbSubcategories.find(s => 
+        s.slug?.toLowerCase() === targetSub || 
+        s.name?.toLowerCase() === targetSub ||
+        s.name?.toLowerCase().replace(/\s+/g, '-') === targetSub
+      );
+      if (matchedSub) {
+        setActiveCategory(matchedSub.name);
+        return;
+      }
+    }
+
+    if (categoryParam) {
+      const targetCat = categoryParam.toLowerCase().trim();
+      const matchedCat = dbCategories.find(c => 
+        c.slug?.toLowerCase() === targetCat || 
+        c.name?.toLowerCase() === targetCat ||
+        c.name?.toLowerCase().replace(/\s+/g, '-') === targetCat
+      );
+      if (matchedCat) {
+        setActiveCategory(matchedCat.name);
+        return;
+      }
+    }
+
+    if (!categoryParam && !subcategoryParam) {
+      setActiveCategory(defaultCategoryTitle);
+    }
+  }, [location.search, dbCategories, dbSubcategories, defaultCategoryTitle]);
 
   // Reset to first page on filter change
   useEffect(() => {
     setCurrentPage(1);
   }, [activeCategory, searchQuery]);
+
+  const handleSelectCategory = (cat) => {
+    setActiveCategory(cat.name);
+    const basePath = isSpecial ? '/special-product' : (location.pathname?.startsWith('/special') ? '/special-product' : (location.pathname || '/products'));
+    if (cat._id === 'all') {
+      navigate(basePath);
+    } else {
+      const slug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
+      navigate(`${basePath}?category=${slug}`);
+    }
+  };
+
+  const handleSelectSubcategory = (sub) => {
+    setActiveCategory(sub.name);
+    const basePath = isSpecial ? '/special-product' : (location.pathname?.startsWith('/special') ? '/special-product' : (location.pathname || '/products'));
+    const slug = sub.slug || sub.name.toLowerCase().replace(/\s+/g, '-');
+    navigate(`${basePath}?subcategory=${slug}`);
+  };
 
   const availableProducts = isSpecial ? dbProducts.filter(p => Boolean(p.isSpecial)) : dbProducts;
 
@@ -113,19 +151,14 @@ export default function Products({ isSpecialOnly = false }) {
   );
 
   return (
-    <div className="pt-24 pb-16 bg-[#f4f7f5] min-h-screen text-black font-sans relative overflow-hidden">
+    <div className="bg-[#f8fafc] min-h-screen py-10">
       
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-100/50 rounded-full blur-[150px] opacity-70 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-      <div className="absolute top-[30%] left-0 w-[600px] h-[600px] bg-yellow-100/30 rounded-full blur-[120px] opacity-50 -translate-x-1/2 pointer-events-none"></div>
-
-      {/* 1. Header Section */}
-      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 relative overflow-hidden mb-12 shadow-sm">
-        <div className="max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-10">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-[13px] font-semibold text-gray-500 mb-4">
+      {/* Header Banner */}
+      <div className="relative overflow-hidden mb-10 py-10 bg-white border-b border-gray-200">
+        <div className="max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-3">
             <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
-            <span>›</span>
+            <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-gray-800">{isSpecial ? 'Special Products' : 'All Products'}</span>
           </div>
 
@@ -165,7 +198,7 @@ export default function Products({ isSpecialOnly = false }) {
                   return (
                     <li key={idx} className="space-y-1">
                       <button 
-                        onClick={() => setActiveCategory(cat.name)}
+                        onClick={() => handleSelectCategory(cat)}
                         className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-[14px] font-semibold transition-all duration-200 ${isActive ? 'bg-[#1e3a8a] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
                       >
                         <span className="flex items-center gap-3">
@@ -190,7 +223,7 @@ export default function Products({ isSpecialOnly = false }) {
                             return (
                               <li key={sub._id}>
                                 <button
-                                  onClick={() => setActiveCategory(sub.name)}
+                                  onClick={() => handleSelectSubcategory(sub)}
                                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-[13px] font-medium transition-all duration-150 ${
                                     isSubActive 
                                       ? 'bg-blue-50 text-[#1e3a8a] font-bold shadow-xs' 
@@ -218,25 +251,28 @@ export default function Products({ isSpecialOnly = false }) {
 
             {/* Need Help CTA */}
             <div className="bg-white rounded-xl border-2 border-[#1e3a8a]/20 p-6 text-center shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1 bg-[#1e3a8a]"></div>
-              <div className="w-12 h-12 bg-blue-50 rounded-full shadow-sm border border-blue-100 flex items-center justify-center text-[#1e3a8a] mx-auto mb-4 group-hover:scale-110 transition-transform duration-500">
-                <CheckCircle2 className="w-6 h-6" />
+              <div className="w-12 h-12 bg-blue-50 text-[#1e3a8a] rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                <Headset className="w-6 h-6" />
               </div>
-              <h4 className="font-bold text-[16px] text-gray-900 mb-2">Need Help Choosing?</h4>
-              <p className="text-gray-600 text-[13.5px] font-medium leading-relaxed mb-6">
-                Our experts are here to help you find the exactly right product.
+              <h4 className="font-bold text-gray-900 mb-2">Need Custom Tooling?</h4>
+              <p className="text-xs text-gray-500 mb-4 leading-relaxed font-medium">
+                Our engineering team manufactures tailored doctor blades and machine parts per specifications.
               </p>
-              <Link to="/contact" className="inline-block w-full py-2.5 rounded-lg border-2 border-[#1e3a8a] text-[#1e3a8a] font-bold text-[13.5px] hover:bg-[#1e3a8a] hover:text-white transition-colors duration-300 shadow-sm">
-                CONTACT US
-              </Link>
+              <button 
+                type="button"
+                onClick={() => window.dispatchEvent(new Event('open-quote-modal'))}
+                className="w-full bg-[#1e3a8a] hover:bg-[#152960] text-white font-bold py-2.5 px-4 rounded-lg text-xs transition-colors shadow-sm"
+              >
+                REQUEST CUSTOM SPECS
+              </button>
             </div>
 
           </div>
 
-          {/* Right Main Area */}
-          <div className="w-full lg:w-3/4 flex flex-col">
+          {/* Right Main Content */}
+          <div className="w-full lg:w-3/4">
             
-            {/* Top Bar (Search & Filters) */}
+            {/* Top Toolbar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-5 mb-10 bg-white/80 backdrop-blur-xl p-4 rounded-2xl border border-gray-200 shadow-sm">
               {/* Search */}
               <div className="relative w-full sm:w-80">
@@ -255,7 +291,26 @@ export default function Products({ isSpecialOnly = false }) {
                 <div className="relative w-full sm:w-48 group">
                   <select 
                     value={activeCategory}
-                    onChange={(e) => setActiveCategory(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const basePath = isSpecial ? '/special-product' : (location.pathname?.startsWith('/special') ? '/special-product' : (location.pathname || '/products'));
+                      if (val === defaultCategoryTitle) {
+                        setActiveCategory(defaultCategoryTitle);
+                        navigate(basePath);
+                      } else {
+                        const matchedCat = dbCategories.find(c => c.name.toLowerCase() === val.toLowerCase());
+                        const matchedSub = dbSubcategories.find(s => s.name.toLowerCase() === val.toLowerCase());
+                        if (matchedSub) {
+                          setActiveCategory(matchedSub.name);
+                          navigate(`${basePath}?subcategory=${matchedSub.slug || matchedSub.name.toLowerCase().replace(/\s+/g, '-')}`);
+                        } else if (matchedCat) {
+                          setActiveCategory(matchedCat.name);
+                          navigate(`${basePath}?category=${matchedCat.slug || matchedCat.name.toLowerCase().replace(/\s+/g, '-')}`);
+                        } else {
+                          setActiveCategory(val);
+                        }
+                      }
+                    }}
                     className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-4 py-3 text-[14px] font-semibold text-gray-700 focus:outline-none focus:border-[#1e3a8a] cursor-pointer shadow-sm hover:border-gray-300 transition-colors"
                   >
                     <option value={defaultCategoryTitle}>{defaultCategoryTitle}</option>
@@ -283,19 +338,20 @@ export default function Products({ isSpecialOnly = false }) {
                   <select className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-4 py-3 text-[14px] font-semibold text-gray-700 focus:outline-none focus:border-[#1e3a8a] cursor-pointer shadow-sm hover:border-gray-300 transition-colors">
                     <option>Sort By: Featured</option>
                   </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none group-hover:text-black transition-colors" />
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none group-hover:text-gray-800 transition-colors" />
                 </div>
 
-                <div className="hidden sm:flex items-center bg-gray-100 border border-gray-200 rounded-xl p-1.5 shadow-inner">
+                {/* View Mode Buttons */}
+                <div className="hidden sm:flex items-center gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200">
                   <button 
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white text-[#1e3a8a] shadow-sm font-bold' : 'text-gray-500 hover:text-black'}`}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white text-[#1e3a8a] shadow-xs' : 'text-gray-500 hover:text-gray-900'}`}
                   >
                     <Grid className="w-5 h-5" />
                   </button>
                   <button 
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white text-[#1e3a8a] shadow-sm font-bold' : 'text-gray-500 hover:text-black'}`}
+                    className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white text-[#1e3a8a] shadow-xs' : 'text-gray-500 hover:text-gray-900'}`}
                   >
                     <List className="w-5 h-5" />
                   </button>
@@ -325,7 +381,7 @@ export default function Products({ isSpecialOnly = false }) {
                       className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                          e.target.onerror = null; 
-                         e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjVmOSIgLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5NDkzYjgiIGR5PSIuM2VtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4='; // Simple gray SVG placeholder fallback
+                         e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjVmOSIgLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5NDkzYjgiIGR5PSIuM2VtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4=';
                       }}
                     />
                     {product.isSpecial && (

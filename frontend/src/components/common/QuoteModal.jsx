@@ -16,7 +16,7 @@ export default function QuoteModal() {
     // Automatic Popup Logic for Lead Generation
     let timer1, timer2, timer3;
     let hasTriggeredScroll = false;
-    
+
     const handleScroll = () => {
       if (!hasTriggeredScroll && window.scrollY > 300) {
         if (localStorage.getItem('quoteSubmitted') !== 'true') {
@@ -36,7 +36,7 @@ export default function QuoteModal() {
       timer1 = setTimeout(() => {
         if (localStorage.getItem('quoteSubmitted') !== 'true') setIsOpen(true);
       }, 5 * 1000);
-      
+
       // Show again at 2 minutes (120 seconds)
       timer2 = setTimeout(() => {
         if (localStorage.getItem('quoteSubmitted') !== 'true') setIsOpen(true);
@@ -104,7 +104,7 @@ export default function QuoteModal() {
 
       {/* Modal Container */}
       <div className="relative w-full max-w-[1050px] bg-white rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.4)] overflow-hidden animate-[scaleUp_0.3s_ease-out] flex flex-col md:flex-row max-h-[95vh] md:max-h-[85vh] overflow-y-auto md:overflow-hidden">
-        
+
         {/* Global Close Button */}
         <button
           onClick={() => setIsOpen(false)}
@@ -117,7 +117,7 @@ export default function QuoteModal() {
         <div className="flex w-full md:w-[55%] relative flex-col justify-between overflow-hidden bg-white shrink-0 min-h-[380px] md:min-h-0 pt-2 md:pt-0">
           {/* Background Image Container */}
           <div className="absolute top-0 right-0 w-full h-full md:h-[calc(100%-72px)] z-0">
-            <div 
+            <div
               className="w-full h-full bg-right-bottom md:bg-right bg-no-repeat bg-[length:150%_auto] md:bg-[length:auto_100%]"
               style={{ backgroundImage: 'url(/images/popup-bg.jpg)' }}
             ></div>
@@ -137,7 +137,7 @@ export default function QuoteModal() {
 
             {/* Heading - Responsive 2 lines on mobile, 4 on desktop */}
             <h2 className="hidden md:block text-[22px] sm:text-[26px] leading-[1.2] md:text-3xl lg:text-4xl font-black mb-2 md:mb-3 tracking-tight md:leading-[1.1] text-slate-800 drop-shadow-sm w-[90%] md:w-auto md:max-w-[50%] z-20 relative">
-              <span className="inline md:hidden">Quality Tools for a <span className="text-orange-500">Sharper</span><br/></span>
+              <span className="inline md:hidden">Quality Tools for a <span className="text-orange-500">Sharper</span><br /></span>
               <span className="hidden md:inline">Quality Tools<br />for a <span className="text-orange-500">Sharper<br /></span></span>
               <span className="text-orange-500">Print Tomorrow</span>
             </h2>
