@@ -28,6 +28,7 @@ const productSchema = new mongoose.Schema({
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
   subcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'Subcategory' },
   isSpecial: { type: Boolean, default: false },
+  price: { type: Number, default: 0 },
   shortDesc: { type: String },
   longDesc: { type: String },
   images: [{ type: String }],

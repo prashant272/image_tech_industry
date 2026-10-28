@@ -17,7 +17,7 @@ const ProductManagement = () => {
   const [uploadingType, setUploadingType] = useState(null);
 
   const initialFormState = {
-    title: '', slug: '', category: '', subcategory: '', isSpecial: false, shortDesc: '', longDesc: '',
+    title: '', slug: '', category: '', subcategory: '', isSpecial: false, price: '', shortDesc: '', longDesc: '',
     images: [''], features: [''], infoBoxes: [{ title: '', value: '', icon: '' }],
     overviewFeatures: [{ title: '', desc: '', icon: '' }], overviewText: [''],
     faqs: [{ question: '', answer: '' }], specifications: [{ label: '', value: '' }],
@@ -96,7 +96,8 @@ const ProductManagement = () => {
       const payload = {
         ...formData,
         category: formData.category || null,
-        subcategory: formData.subcategory ? formData.subcategory : null
+        subcategory: formData.subcategory ? formData.subcategory : null,
+        price: formData.price !== '' && !isNaN(formData.price) ? Number(formData.price) : 0
       };
 
       if (editingId) {
@@ -154,6 +155,7 @@ const ProductManagement = () => {
       category: product.category?._id || product.category || '',
       subcategory: product.subcategory?._id || product.subcategory || '',
       isSpecial: product.isSpecial || false,
+      price: product.price !== undefined && product.price !== null ? product.price : '',
       shortDesc: product.shortDesc || '',
       longDesc: product.longDesc || '',
       images: product.images?.length ? product.images : [''],
@@ -178,6 +180,7 @@ const ProductManagement = () => {
       category: product.category?._id || product.category || '',
       subcategory: product.subcategory?._id || product.subcategory || '',
       isSpecial: product.isSpecial || false,
+      price: product.price !== undefined && product.price !== null ? product.price : '',
       shortDesc: product.shortDesc || '',
       longDesc: product.longDesc || '',
       images: product.images?.length ? product.images : [''],
@@ -246,6 +249,7 @@ const ProductManagement = () => {
               <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Product Title</th>
               <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Category</th>
               <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Subcategory</th>
+              <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Price (₹)</th>
               <th scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Special</th>
               <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
             </tr>
@@ -258,6 +262,11 @@ const ProductManagement = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-blue-600">
                     {product.subcategory?.name || <span className="text-gray-400 italic font-normal">—</span>}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-bold text-gray-800">
+                    {product.price ? `₹${Number(product.price).toLocaleString('en-IN')}` : <span className="text-gray-400 font-normal italic">—</span>}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -333,7 +342,20 @@ const ProductManagement = () => {
                         .map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
                     </select>
                   </div>
-                  <div className="flex items-center mt-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Price (₹) <span className="text-xs text-gray-400 font-normal">(Optional - for external website)</span>
+                    </label>
+                    <input 
+                      type="number" 
+                      step="any" 
+                      placeholder="e.g. 1500" 
+                      value={formData.price} 
+                      onChange={(e) => setFormData({...formData, price: e.target.value})} 
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" 
+                    />
+                  </div>
+                  <div className="flex items-center mt-6">
                     <input type="checkbox" id="isSpecial" checked={formData.isSpecial} onChange={(e) => setFormData({...formData, isSpecial: e.target.checked})} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
                     <label htmlFor="isSpecial" className="ml-2 block text-sm text-gray-900 font-medium">Mark as Special Product</label>
                   </div>

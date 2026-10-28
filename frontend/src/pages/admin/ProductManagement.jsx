@@ -15,7 +15,7 @@ const ProductManagement = () => {
   const [uploadingType, setUploadingType] = useState(null);
 
   const initialFormState = {
-    title: '', slug: '', category: '', isSpecial: false, shortDesc: '', longDesc: '',
+    title: '', slug: '', category: '', isSpecial: false, price: '', shortDesc: '', longDesc: '',
     images: [''], features: [''], infoBoxes: [{ title: '', value: '', icon: '' }],
     overviewFeatures: [{ title: '', desc: '', icon: '' }], overviewText: [''],
     faqs: [{ question: '', answer: '' }], specifications: [{ label: '', value: '' }],
@@ -81,10 +81,14 @@ const ProductManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        price: formData.price !== '' && !isNaN(formData.price) ? Number(formData.price) : 0
+      };
       if (editingId) {
-        await apiClient.put(`/products/${editingId}`, formData);
+        await apiClient.put(`/products/${editingId}`, payload);
       } else {
-        await apiClient.post('/products', formData);
+        await apiClient.post('/products', payload);
       }
       setShowModal(false);
       setFormData(initialFormState);
@@ -134,6 +138,7 @@ const ProductManagement = () => {
       slug: product.slug || '',
       category: product.category?._id || '',
       isSpecial: product.isSpecial || false,
+      price: product.price !== undefined && product.price !== null ? product.price : '',
       shortDesc: product.shortDesc || '',
       longDesc: product.longDesc || '',
       images: product.images?.length ? product.images : [''],
@@ -157,6 +162,7 @@ const ProductManagement = () => {
       slug: `${product.slug || ''}-copy`,
       category: product.category?._id || '',
       isSpecial: product.isSpecial || false,
+      price: product.price !== undefined && product.price !== null ? product.price : '',
       shortDesc: product.shortDesc || '',
       longDesc: product.longDesc || '',
       images: product.images?.length ? product.images : [''],
@@ -224,6 +230,7 @@ const ProductManagement = () => {
             <tr>
               <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Product Title</th>
               <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Category</th>
+              <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Price (₹)</th>
               <th scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Special</th>
               <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
             </tr>
@@ -233,6 +240,11 @@ const ProductManagement = () => {
               <tr key={product._id} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-bold text-gray-900">{product.title}</div></td>
                 <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm font-medium text-gray-500">{product.category?.name || 'N/A'}</div></td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-bold text-gray-800">
+                    {product.price ? `₹${Number(product.price).toLocaleString('en-IN')}` : <span className="text-gray-400 font-normal italic">—</span>}
+                  </div>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span className={`inline-flex px-3 py-1 text-xs font-bold leading-5 rounded-full ${product.isSpecial ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
                     {product.isSpecial ? 'Yes' : 'No'}
@@ -281,6 +293,19 @@ const ProductManagement = () => {
                       <option value="">Select Category</option>
                       {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                     </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Price (₹) <span className="text-xs text-gray-400 font-normal">(Optional - for external website)</span>
+                    </label>
+                    <input 
+                      type="number" 
+                      step="any" 
+                      placeholder="e.g. 1500" 
+                      value={formData.price} 
+                      onChange={(e) => setFormData({...formData, price: e.target.value})} 
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" 
+                    />
                   </div>
                   <div className="flex items-center mt-6">
                     <input type="checkbox" id="isSpecial" checked={formData.isSpecial} onChange={(e) => setFormData({...formData, isSpecial: e.target.checked})} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />

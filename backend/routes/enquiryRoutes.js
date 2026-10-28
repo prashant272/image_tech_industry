@@ -2,6 +2,7 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import Enquiry from "../models/Enquiry.js";
 import { verifyAdmin } from "../middleware/auth.js";
+import { sendEnquiryEmail } from "../services/emailService.js";
 
 const router = express.Router();
 
@@ -57,6 +58,11 @@ router.post("/submit", enquiryLimiter, async (req, res) => {
         });
 
         await enquiry.save();
+
+        // Send email notification to sales & Prashant
+        sendEnquiryEmail(enquiry).catch((err) => {
+            console.error("Non-blocking error in sending enquiry email:", err);
+        });
 
         res.status(201).json({
             success: true,
