@@ -10,7 +10,8 @@ const router = express.Router();
 const enquiryLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
     max: 5,
-    message: { success: false, message: "Too many enquiries from this IP, please try again after 15 minutes." }
+    message: { success: false, message: "Too many enquiries from this IP, please try again after 15 minutes." },
+    validate: { xForwardedForHeader: false }
 });
 
 // Submit new enquiry (public route)

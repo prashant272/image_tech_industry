@@ -19,6 +19,9 @@ import customPageRoutes from './routes/customPageRoutes.js';
 dotenv.config();
 const app = express();
 
+// Trust proxy for reverse proxy / Docker / Nginx environments (enables proper client IP resolution)
+app.set("trust proxy", 1);
+
 app.use(cors());
 app.use(express.json());
 
