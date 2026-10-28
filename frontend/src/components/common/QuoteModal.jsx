@@ -119,7 +119,7 @@ export default function QuoteModal() {
           <div className="absolute top-0 right-0 w-full h-full md:h-[calc(100%-72px)] z-0">
             <div
               className="w-full h-full bg-right-bottom md:bg-right bg-no-repeat bg-[length:150%_auto] md:bg-[length:auto_100%]"
-              style={{ backgroundImage: 'url(/images/popup-bg.jpg)' }}
+              style={{ backgroundImage: 'url(/images/popup-bg.jpg?v=2)' }}
             ></div>
             {/* Soft White Fade (Desktop only) */}
             <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-white/90 via-white/40 to-transparent w-[60%]"></div>

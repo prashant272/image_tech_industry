@@ -34,7 +34,11 @@ export async function generateMetadata({ params }) {
         `High-precision ${productName} manufactured by ImageTech Industries for printing, coating and packaging applications.`
       );
 
-  const ogImageUrl = product.images?.[0]?.url || (typeof product.images?.[0] === 'string' ? product.images[0] : null);
+  const nonVideoImage = product.images?.find(img => {
+    const url = typeof img === 'string' ? img : img?.url;
+    return url && !url.match(/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i) && !url.includes('youtube.com') && !url.includes('youtu.be');
+  });
+  const ogImageUrl = nonVideoImage?.url || (typeof nonVideoImage === 'string' ? nonVideoImage : (typeof product.images?.[0] === 'string' ? product.images[0] : product.images?.[0]?.url));
 
   return buildPageMetadata({
     title,

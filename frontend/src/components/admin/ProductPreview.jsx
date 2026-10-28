@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle2, Settings, Layout, Maximize, Truck, Target, Shield, Activity, 
-  Plus, Minus, ArrowRight
+  Plus, Minus, ArrowRight, Play
 } from 'lucide-react';
+import { isVideoUrl, isEmbedVideo, getEmbedUrl } from '../../lib/mediaUtils';
 
 const IconMap = {
   Settings: <Settings className="w-5 h-5" />,
@@ -24,11 +25,12 @@ export default function ProductPreview({ product, categories }) {
   const categoryName = categories.find(c => c._id === product.category)?.name || 'Category Name';
   
   // Clean arrays (remove empty strings) for cleaner preview
-  const validImages = product.images.filter(i => i && i.trim() !== '');
-  const mainImage = validImages.length > 0 ? validImages[activeImage] || validImages[0] : 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjVmOSIgLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5NDkzYjgiIGR5PSIuM2VtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4=';
+  const validImages = (product.images || []).filter(i => i && typeof i === 'string' && i.trim() !== '');
+  const mainImage = validImages.length > 0 ? (validImages[activeImage] || validImages[0]) : 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjVmOSIgLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5NDkzYjgiIGR5PSIuM2VtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4=';
+  const isMainVideo = isVideoUrl(mainImage);
 
-  const validFeatures = product.features.filter(f => f && f.trim() !== '');
-  const validOverviewText = product.overviewText.filter(t => t && t.trim() !== '');
+  const validFeatures = (product.features || []).filter(f => f && f.trim() !== '');
+  const validOverviewText = (product.overviewText || []).filter(t => t && t.trim() !== '');
 
   return (
     <div className="bg-[#f8f9fa] min-h-full font-sans text-gray-900 select-none rounded-xl overflow-hidden border-2 border-gray-200 flex flex-col">
@@ -51,31 +53,64 @@ export default function ProductPreview({ product, categories }) {
         {/* Hero Section */}
         <div className="flex flex-col xl:flex-row gap-8 mb-12">
           
-          {/* Image Gallery */}
+          {/* Image & Video Gallery */}
           <div className="w-full xl:w-1/2 flex gap-3 h-[300px]">
             {/* Thumbnails */}
             <div className="flex flex-col gap-2 w-16 shrink-0 overflow-y-auto hide-scrollbar">
-              {validImages.map((img, idx) => (
-                <div 
-                  key={idx}
-                  className={`w-full aspect-square rounded-md border-2 overflow-hidden transition-all ${activeImage === idx ? 'border-blue-600' : 'border-gray-200'}`}
-                >
-                  <img src={img} alt="Thumb" className="w-full h-full object-cover" />
-                </div>
-              ))}
+              {validImages.map((img, idx) => {
+                const isItemVideo = isVideoUrl(img);
+                return (
+                  <div 
+                    key={idx}
+                    onClick={() => setActiveImage(idx)}
+                    className={`w-full aspect-square rounded-md border-2 overflow-hidden transition-all cursor-pointer relative ${activeImage === idx ? 'border-blue-600 ring-2 ring-blue-400/30' : 'border-gray-200 hover:border-gray-400'}`}
+                  >
+                    {isItemVideo ? (
+                      <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                        <video src={img} className="w-full h-full object-cover opacity-60" preload="metadata" muted />
+                        <Play className="w-3.5 h-3.5 text-white fill-white absolute" />
+                      </div>
+                    ) : (
+                      <img src={img} alt="Thumb" className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                );
+              })}
               {validImages.length === 0 && (
                  <div className="w-full aspect-square rounded-md border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
-                    <span className="text-[9px] text-gray-400 font-bold">Image</span>
+                    <span className="text-[9px] text-gray-400 font-bold">Media</span>
                  </div>
               )}
             </div>
-            {/* Main Image */}
-            <div className="flex-grow rounded-xl overflow-hidden bg-white border border-gray-200 relative">
-              <img 
-                src={mainImage} 
-                alt={product.title} 
-                className="w-full h-full object-contain p-2"
-              />
+            {/* Main Media View */}
+            <div className="flex-grow rounded-xl overflow-hidden bg-white border border-gray-200 relative flex items-center justify-center">
+              {isMainVideo ? (
+                isEmbedVideo(mainImage) ? (
+                  <iframe 
+                    src={getEmbedUrl(mainImage)} 
+                    title={product.title || 'Video'} 
+                    className="w-full h-full rounded-xl"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video 
+                    key={mainImage}
+                    src={mainImage} 
+                    controls 
+                    autoPlay 
+                    muted 
+                    playsInline 
+                    className="w-full h-full object-contain bg-black rounded-xl"
+                  />
+                )
+              ) : (
+                <img 
+                  src={mainImage} 
+                  alt={product.title} 
+                  className="w-full h-full object-contain p-2"
+                />
+              )}
             </div>
           </div>
 
@@ -112,7 +147,7 @@ export default function ProductPreview({ product, categories }) {
 
             {/* Info Boxes */}
             <div className="grid grid-cols-2 gap-2 mt-auto">
-              {product.infoBoxes.map((box, idx) => (
+              {(product.infoBoxes || []).map((box, idx) => (
                 <div key={idx} className="bg-white border border-gray-200 rounded-lg p-3 flex flex-col justify-center gap-1 shadow-sm">
                   <div className="text-gray-400 scale-75 origin-left">{IconMap[box.icon] || <Settings className="w-4 h-4" />}</div>
                   <div>
@@ -162,7 +197,7 @@ export default function ProductPreview({ product, categories }) {
                 <div className="w-full">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Key Features</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {product.overviewFeatures.map((feat, idx) => (
+                    {(product.overviewFeatures || []).map((feat, idx) => (
                       <div key={idx} className="flex gap-3">
                         <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
                            {IconMap[feat.icon] || <Target className="w-4 h-4 text-blue-600" />}
@@ -184,7 +219,7 @@ export default function ProductPreview({ product, categories }) {
                 <div className="overflow-hidden rounded-lg border border-gray-200">
                   <table className="w-full text-left border-collapse">
                     <tbody>
-                      {product.specifications.map((spec, idx) => (
+                      {(product.specifications || []).map((spec, idx) => (
                         <tr key={idx} className="border-b border-gray-200 last:border-0 bg-white">
                           <th className="py-2 px-3 text-[12px] font-bold text-gray-700 bg-gray-50 w-1/3">{spec.label || 'Label'}</th>
                           <td className="py-2 px-3 text-[12px] font-medium text-gray-900">{spec.value || 'Value'}</td>

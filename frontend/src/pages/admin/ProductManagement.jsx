@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, X, Eye, Copy } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, X, Eye, Copy, Video, Image as ImageIcon, Upload, Loader2, Play } from 'lucide-react';
 import apiClient from '../../api/client';
 import ProductPreview from '../../components/admin/ProductPreview';
+import { isVideoUrl } from '../../lib/mediaUtils';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,8 @@ const ProductManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadingIndex, setUploadingIndex] = useState(null);
+  const [uploadingType, setUploadingType] = useState(null);
 
   const initialFormState = {
     title: '', slug: '', category: '', isSpecial: false, shortDesc: '', longDesc: '',
@@ -92,13 +95,22 @@ const ProductManagement = () => {
     }
   };
 
-  const handleImageUpload = async (e, index) => {
+  const handleMediaUpload = async (e, index, mediaType = 'image') => {
     const file = e.target.files[0];
     if (!file) return;
 
+    if (file.size > 100 * 1024 * 1024) {
+      alert('File size exceeds the 100MB limit. Please select a smaller file.');
+      e.target.value = '';
+      return;
+    }
+
     setIsUploading(true);
+    setUploadingIndex(index);
+    setUploadingType(mediaType);
+
     const formDataObj = new FormData();
-    formDataObj.append('image', file);
+    formDataObj.append(mediaType === 'video' ? 'video' : 'image', file);
 
     try {
       const response = await apiClient.post('/upload', formDataObj, {
@@ -106,10 +118,13 @@ const ProductManagement = () => {
       });
       handleArrayChange('images', index, response.data.url);
     } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please try again.');
+      console.error('Error uploading media:', error);
+      alert(`Failed to upload ${mediaType}: ${error.response?.data?.message || error.message || 'Please try again.'}`);
     } finally {
       setIsUploading(false);
+      setUploadingIndex(null);
+      setUploadingType(null);
+      e.target.value = '';
     }
   };
 
@@ -282,23 +297,161 @@ const ProductManagement = () => {
                 </div>
               </div>
 
-              {/* Images */}
+              {/* Product Media (Images & Videos) */}
               <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-gray-800 border-b pb-2 flex justify-between items-center">
-                  Images <button type="button" onClick={() => addArrayItem('images')} className="text-sm text-blue-600 hover:text-blue-800 font-bold">+ Add Image</button>
-                </h4>
-                {formData.images.map((img, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <input type="text" value={img} onChange={(e) => handleArrayChange('images', idx, e.target.value)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="Image URL will appear here or paste one..." />
-                    
-                    <input type="file" id={`image-upload-${idx}`} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, idx)} />
-                    <label htmlFor={`image-upload-${idx}`} className="cursor-pointer bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap shadow-sm">
-                      {isUploading ? 'Uploading...' : 'Upload S3'}
-                    </label>
-
-                    <button type="button" onClick={() => removeArrayItem('images', idx)} className="text-red-500 hover:text-red-700 ml-2"><Trash2 className="w-5 h-5"/></button>
+                <div className="border-b pb-2 flex flex-wrap justify-between items-center gap-2">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                      <span>Product Media</span>
+                      <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                        Images & Videos
+                      </span>
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Upload product photos or videos (up to 100MB) or paste MP4/YouTube/Vimeo links.
+                    </p>
                   </div>
-                ))}
+                  <div className="flex items-center gap-2">
+                    <button 
+                      type="button" 
+                      onClick={() => addArrayItem('images', '')} 
+                      className="inline-flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-md font-bold transition-colors cursor-pointer"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      + Add Image
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => addArrayItem('images', '')} 
+                      className="inline-flex items-center gap-1.5 text-xs bg-purple-50 text-purple-700 hover:bg-purple-100 px-3 py-1.5 rounded-md font-bold transition-colors cursor-pointer"
+                    >
+                      <Video className="w-3.5 h-3.5" />
+                      + Add Video
+                    </button>
+                  </div>
+                </div>
+
+                {formData.images.map((mediaUrl, idx) => {
+                  const isVid = isVideoUrl(mediaUrl);
+                  const isThisUploading = isUploading && uploadingIndex === idx;
+
+                  return (
+                    <div key={idx} className="p-3 bg-gray-50 rounded-xl border border-gray-200 flex flex-col gap-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-gray-400">#{idx + 1}</span>
+                          {isVid ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                              <Video className="w-3 h-3" /> Video
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                              <ImageIcon className="w-3 h-3" /> Image
+                            </span>
+                          )}
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => removeArrayItem('images', idx)} 
+                          className="text-red-400 hover:text-red-600 transition-colors p-1 cursor-pointer"
+                          title="Remove item"
+                        >
+                          <Trash2 className="w-4 h-4"/>
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {/* Mini Preview Thumbnail */}
+                        <div className="w-12 h-12 rounded-lg bg-gray-200 border border-gray-300 shrink-0 overflow-hidden flex items-center justify-center relative">
+                          {mediaUrl ? (
+                            isVid ? (
+                              <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                                <video src={mediaUrl} className="w-full h-full object-cover opacity-70" preload="metadata" muted />
+                                <Play className="w-4 h-4 text-white fill-white absolute" />
+                              </div>
+                            ) : (
+                              <img src={mediaUrl} alt="Preview" className="w-full h-full object-cover" />
+                            )
+                          ) : (
+                            <span className="text-[10px] text-gray-400 font-bold">Empty</span>
+                          )}
+                        </div>
+
+                        {/* URL Input */}
+                        <input 
+                          type="text" 
+                          value={mediaUrl} 
+                          onChange={(e) => handleArrayChange('images', idx, e.target.value)} 
+                          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-gray-800" 
+                          placeholder={isVid ? "Paste video link (MP4, YouTube, Vimeo)..." : "Paste image URL or use upload buttons below..."} 
+                        />
+                      </div>
+
+                      {/* Upload Buttons */}
+                      <div className="flex flex-wrap items-center justify-end gap-2 pt-1 border-t border-gray-200/60">
+                        {/* Image Upload Input */}
+                        <input 
+                          type="file" 
+                          id={`image-upload-${idx}`} 
+                          className="hidden" 
+                          accept="image/*" 
+                          disabled={isUploading}
+                          onChange={(e) => handleMediaUpload(e, idx, 'image')} 
+                        />
+                        <label 
+                          htmlFor={`image-upload-${idx}`} 
+                          className={`cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                            isThisUploading && uploadingType === 'image'
+                              ? 'bg-blue-100 text-blue-700 border-blue-300'
+                              : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-300 shadow-xs'
+                          }`}
+                        >
+                          {isThisUploading && uploadingType === 'image' ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Uploading Photo...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5 text-blue-600" />
+                              <span>Upload Photo</span>
+                            </>
+                          )}
+                        </label>
+
+                        {/* Video Upload Input */}
+                        <input 
+                          type="file" 
+                          id={`video-upload-${idx}`} 
+                          className="hidden" 
+                          accept="video/mp4,video/webm,video/ogg,video/quicktime,video/*" 
+                          disabled={isUploading}
+                          onChange={(e) => handleMediaUpload(e, idx, 'video')} 
+                        />
+                        <label 
+                          htmlFor={`video-upload-${idx}`} 
+                          className={`cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                            isThisUploading && uploadingType === 'video'
+                              ? 'bg-purple-100 text-purple-700 border-purple-300'
+                              : 'bg-white hover:bg-purple-50 text-purple-700 border-purple-200 shadow-xs'
+                          }`}
+                        >
+                          {isThisUploading && uploadingType === 'video' ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Uploading Video...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Video className="w-3.5 h-3.5 text-purple-600" />
+                              <span>Upload Video</span>
+                            </>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Features */}

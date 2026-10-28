@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Eye, ArrowRight, CheckCircle, Truck, Wrench, Handshake, PenTool, Settings, Camera, FlaskConical, FileText, Blocks } from 'lucide-react';
+import { Eye, ArrowRight, CheckCircle, Truck, Wrench, Handshake, PenTool, Settings, Camera, FlaskConical, FileText, Blocks, Play } from 'lucide-react';
+import { getFirstImageUrl, hasVideoMedia, isVideoUrl } from '../../lib/mediaUtils';
 
 const productIcons = {
   'Doctor Blades': <Blocks className="w-5 h-5 text-[#0a192f]" />,
@@ -34,12 +35,18 @@ const features = [
 ];
 
 export default function OurProducts({ initialProducts = [] }) {
-  const displayProducts = (initialProducts || []).slice(0, 5).map(p => ({
-    ...p,
-    image: p.images && p.images.length > 0 && p.images[0]?.trim() !== '' ? p.images[0] : '',
-    desc: p.shortDesc || '',
-    categoryName: p.category?.name || p.category || '',
-  }));
+  const displayProducts = (initialProducts || []).slice(0, 5).map(p => {
+    const media = p.images || [];
+    const firstImg = getFirstImageUrl(media, '');
+    const hasVideo = hasVideoMedia(media);
+    return {
+      ...p,
+      image: firstImg,
+      hasVideo: hasVideo,
+      desc: p.shortDesc || '',
+      categoryName: p.category?.name || p.category || '',
+    };
+  });
 
   return (
     <section className="pb-20 lg:pb-28 pt-4 lg:pt-6 bg-[#f8f9fa] relative font-sans overflow-hidden" id="our-products">
@@ -70,15 +77,28 @@ export default function OurProducts({ initialProducts = [] }) {
             >
               {/* Product Image Box */}
               <div className="relative h-56 xl:h-52 bg-gray-100 overflow-hidden border-b border-gray-100">
-                <img 
-                  src={product.image || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjVmOSIgLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5NDkzYjgiIGR5PSIuM2VtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4='} 
-                  alt={product.title}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
-                />
+                {isVideoUrl(product.image) ? (
+                  <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                    <video src={product.image} className="w-full h-full object-cover opacity-70" preload="metadata" muted />
+                    <Play className="w-8 h-8 text-white fill-white absolute" />
+                  </div>
+                ) : (
+                  <img 
+                    src={product.image || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA4MDAgNjAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBzbGljZSI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjVmOSIgLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5NDkzYjgiIGR5PSIuM2VtIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4='} 
+                    alt={product.title}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a192f]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
+                {product.hasVideo && (
+                  <span className="absolute top-4 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider bg-purple-600 text-white shadow-sm flex items-center gap-1 z-10 uppercase">
+                    <Play className="w-2.5 h-2.5 fill-white" /> Video
+                  </span>
+                )}
+
                 {/* Eye Icon */}
                 <span className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md transform scale-100 hover:bg-[#1d4ed8] hover:text-white text-[#1d4ed8] z-10 transition-colors duration-300">
                   <Eye className="w-4 h-4" />

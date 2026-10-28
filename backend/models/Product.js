@@ -31,6 +31,7 @@ const productSchema = new mongoose.Schema({
   shortDesc: { type: String },
   longDesc: { type: String },
   images: [{ type: String }],
+  videos: [{ type: String }],
   features: [{ type: String }],
   infoBoxes: [infoBoxSchema],
   overviewFeatures: [overviewFeatureSchema],

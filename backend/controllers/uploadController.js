@@ -18,22 +18,22 @@ const s3Client = new S3Client({
 const storage = multer.memoryStorage();
 export const upload = multer({ 
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit to support both images and videos
 });
 
 export const uploadToS3 = async (req, res) => {
   try {
-    if (!req.file) {
+    const file = req.file || (req.files && (req.files[0] || req.files.image?.[0] || req.files.video?.[0] || req.files.media?.[0]));
+    if (!file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const file = req.file;
     let fileName = `${crypto.randomBytes(16).toString('hex')}`;
     let processedBuffer = file.buffer;
-    let mimeType = file.mimetype;
+    let mimeType = file.mimetype || 'application/octet-stream';
 
     // If it's an image, optimize and convert to WebP
-    if (file.mimetype.startsWith('image/')) {
+    if (file.mimetype && file.mimetype.startsWith('image/')) {
       fileName = `${fileName}.webp`;
       processedBuffer = await sharp(file.buffer)
         .resize({ width: 1920, withoutEnlargement: true })
@@ -41,7 +41,8 @@ export const uploadToS3 = async (req, res) => {
         .toBuffer();
       mimeType = 'image/webp';
     } else {
-      const fileExtension = path.extname(file.originalname);
+      // For videos or other media files, keep original extension
+      const fileExtension = path.extname(file.originalname) || (file.mimetype && file.mimetype.includes('webm') ? '.webm' : '.mp4');
       fileName = `${fileName}${fileExtension}`;
     }
 
@@ -57,9 +58,13 @@ export const uploadToS3 = async (req, res) => {
 
     const fileUrl = `${process.env.R2_PUBLIC_URL}/products/${fileName}`;
 
-    res.status(200).json({ url: fileUrl, message: 'Upload successful' });
+    res.status(200).json({ 
+      url: fileUrl, 
+      isVideo: Boolean(file.mimetype && file.mimetype.startsWith('video/')),
+      message: 'Upload successful' 
+    });
   } catch (error) {
     console.error('Error uploading to S3:', error);
-    res.status(500).json({ message: 'Error uploading image to S3', error: error.message });
+    res.status(500).json({ message: 'Error uploading file to S3', error: error.message });
   }
 };

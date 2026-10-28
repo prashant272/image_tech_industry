@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   CheckCircle2, Settings, Layout, Maximize, Truck, Target, Shield, Activity,
-  Plus, Minus, ArrowRight, ArrowLeft
+  Plus, Minus, ArrowRight, ArrowLeft, Play
 } from 'lucide-react';
+import { isVideoUrl, isEmbedVideo, getEmbedUrl } from '../lib/mediaUtils';
 import CTA from '../components/home/CTA';
 import apiClient from '../api/client';
 
@@ -106,37 +107,90 @@ export default function ProductDetail() {
         {/* Hero Section */}
         <div className="flex flex-col lg:flex-row gap-12 mb-16 items-start">
 
-          {/* Image Gallery */}
+          {/* Media (Image & Video) Gallery */}
           <div className="w-full lg:w-1/2 flex flex-col-reverse md:flex-row gap-4 md:h-[500px] lg:sticky lg:top-32">
             {/* Thumbnails */}
             <div className="flex flex-row md:flex-col gap-3 md:w-20 shrink-0 overflow-x-auto md:overflow-y-auto hide-scrollbar pb-2 md:pb-0">
-              {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImage(idx)}
-                  className={`w-20 md:w-full shrink-0 aspect-square rounded-lg border-2 overflow-hidden transition-all ${activeImage === idx ? 'border-blue-600' : 'border-gray-200 hover:border-gray-400'}`}
+              {(product.images || []).map((img, idx) => {
+                const isItemVid = isVideoUrl(img);
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImage(idx)}
+                    className={`w-20 md:w-full shrink-0 aspect-square rounded-lg border-2 overflow-hidden transition-all relative cursor-pointer ${
+                      activeImage === idx ? 'border-blue-600 ring-2 ring-blue-500/20' : 'border-gray-200 hover:border-gray-400'
+                    }`}
+                  >
+                    {isItemVid ? (
+                      <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                        <video src={img} className="w-full h-full object-cover opacity-65" preload="metadata" muted />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+                          <Play className="w-5 h-5 text-white fill-white drop-shadow-md" />
+                        </div>
+                        <span className="absolute bottom-1 right-1 bg-black/75 text-white text-[8px] font-black tracking-wider px-1 py-0.5 rounded">
+                          VIDEO
+                        </span>
+                      </div>
+                    ) : (
+                      <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Main Media View */}
+            {(() => {
+              const currentMedia = product.images && product.images[activeImage] ? product.images[activeImage] : (product.images?.[0] || '');
+              const isCurrentVid = isVideoUrl(currentMedia);
+
+              if (isCurrentVid) {
+                return (
+                  <div className="w-full aspect-square rounded-2xl overflow-hidden bg-black border border-gray-200 flex items-center justify-center relative shadow-inner">
+                    {isEmbedVideo(currentMedia) ? (
+                      <iframe
+                        src={getEmbedUrl(currentMedia)}
+                        title={product.title}
+                        className="w-full h-full rounded-2xl"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video
+                        key={currentMedia}
+                        src={currentMedia}
+                        controls
+                        autoPlay
+                        playsInline
+                        className="w-full h-full object-contain max-h-[500px]"
+                      >
+                        Your browser does not support HTML5 video.
+                      </video>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  className="w-full aspect-square rounded-2xl overflow-hidden bg-white border border-gray-200 relative cursor-zoom-in flex items-center justify-center"
+                  onMouseEnter={() => setIsZooming(true)}
+                  onMouseLeave={() => setIsZooming(false)}
+                  onMouseMove={handleMouseMove}
                 >
-                  <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-            {/* Main Image */}
-            <div
-              className="w-full aspect-square rounded-2xl overflow-hidden bg-white border border-gray-200 relative cursor-zoom-in flex items-center justify-center"
-              onMouseEnter={() => setIsZooming(true)}
-              onMouseLeave={() => setIsZooming(false)}
-              onMouseMove={handleMouseMove}
-            >
-              <img
-                src={product.images[activeImage]}
-                alt={product.title}
-                className={`w-full h-full object-contain transition-transform duration-200 ease-out`}
-                style={{
-                  transform: isZooming ? 'scale(2.5)' : 'scale(1)',
-                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-                }}
-              />
-            </div>
+                  <img
+                    src={currentMedia || '/images/logo.png'}
+                    alt={product.title}
+                    className="w-full h-full object-contain transition-transform duration-200 ease-out"
+                    style={{
+                      transform: isZooming ? 'scale(2.5)' : 'scale(1)',
+                      transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
+                    }}
+                  />
+                </div>
+              );
+            })()}
           </div>
 
           {/* Product Info */}

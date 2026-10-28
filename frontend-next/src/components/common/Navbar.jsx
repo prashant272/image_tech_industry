@@ -55,7 +55,6 @@ const Navbar = () => {
   const [dbProducts, setDbProducts] = useState(() => cachedNavProducts || []);
 
   useEffect(() => {
-    if (cachedNavCategories && cachedNavSubcategories && cachedNavProducts) return;
     const fetchData = async () => {
       try {
         const [catRes, subRes, prodRes] = await Promise.all([
@@ -77,7 +76,7 @@ const Navbar = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [location.pathname]);
 
   const getSubcategoriesByCategory = (categoryId) => {
     return dbSubcategories.filter(s => s.category?._id === categoryId || s.category === categoryId);
@@ -289,16 +288,27 @@ const Navbar = () => {
                       const maxOffset = Math.max(0, (dbCategories.length * 35) - tier2Height);
                       const tier2Top = Math.min(hoveredCatIndex * 35, maxOffset);
 
+                      const isLargeList = subProds.length > 8;
                       const tier3Height = subProds.length * itemHeight;
                       const maxSubOffset = Math.max(0, tier2Height - tier3Height);
-                      const tier3Top = tier2Top + Math.min(subIndex * itemHeight, maxSubOffset);
+                      const tier3Top = isLargeList ? 0 : (tier2Top + Math.min(subIndex * itemHeight, maxSubOffset));
+
+                      const sortedSubProds = [...subProds].sort((a, b) => {
+                        const numA = parseInt((a.title.match(/(\d+)\s*Dyne/i) || [])[1]);
+                        const numB = parseInt((b.title.match(/(\d+)\s*Dyne/i) || [])[1]);
+                        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                        return (a.title || '').localeCompare(b.title || '');
+                      });
 
                       return (
                         <div
-                          style={{ marginTop: `${tier3Top}px` }}
-                          className="w-72 bg-white border border-gray-200/90 rounded-xl shadow-xl py-1 ml-1 h-fit max-h-[80vh] overflow-y-auto overscroll-contain relative before:absolute before:-left-3 before:top-0 before:w-3 before:h-full [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 transition-all duration-150"
+                          style={{
+                            marginTop: `${tier3Top}px`,
+                            maxHeight: isLargeList ? 'calc(100vh - 100px)' : `calc(100vh - 100px - ${tier3Top}px)`
+                          }}
+                          className="w-72 bg-white border border-gray-200/90 rounded-xl shadow-xl py-1 pb-3 ml-1 h-fit overflow-y-auto overscroll-contain relative before:absolute before:-left-3 before:top-0 before:w-3 before:h-full [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 transition-all duration-150"
                         >
-                          {subProds.map(p => (
+                          {sortedSubProds.map(p => (
                             <Link
                               key={p._id}
                               to={getPath(`/products/${p.slug}`)}
@@ -452,16 +462,27 @@ const Navbar = () => {
                       const maxOffset = Math.max(0, (categoriesWithSpecial.length * 35) - tier2Height);
                       const tier2Top = Math.min(hoveredCatIndex * 35, maxOffset);
 
+                      const isLargeList = subProds.length > 8;
                       const tier3Height = subProds.length * itemHeight;
                       const maxSubOffset = Math.max(0, tier2Height - tier3Height);
-                      const tier3Top = tier2Top + Math.min(subIndex * itemHeight, maxSubOffset);
+                      const tier3Top = isLargeList ? 0 : (tier2Top + Math.min(subIndex * itemHeight, maxSubOffset));
+
+                      const sortedSubProds = [...subProds].sort((a, b) => {
+                        const numA = parseInt((a.title.match(/(\d+)\s*Dyne/i) || [])[1]);
+                        const numB = parseInt((b.title.match(/(\d+)\s*Dyne/i) || [])[1]);
+                        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                        return (a.title || '').localeCompare(b.title || '');
+                      });
 
                       return (
                         <div
-                          style={{ marginTop: `${tier3Top}px` }}
-                          className="w-72 bg-white border border-gray-200/90 rounded-xl shadow-xl py-1 ml-1 h-fit max-h-[80vh] overflow-y-auto overscroll-contain relative before:absolute before:-left-3 before:top-0 before:w-3 before:h-full [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 transition-all duration-150"
+                          style={{
+                            marginTop: `${tier3Top}px`,
+                            maxHeight: isLargeList ? 'calc(100vh - 100px)' : `calc(100vh - 100px - ${tier3Top}px)`
+                          }}
+                          className="w-72 bg-white border border-gray-200/90 rounded-xl shadow-xl py-1 pb-3 ml-1 h-fit overflow-y-auto overscroll-contain relative before:absolute before:-left-3 before:top-0 before:w-3 before:h-full [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 transition-all duration-150"
                         >
-                          {subProds.map(p => (
+                          {sortedSubProds.map(p => (
                             <Link
                               key={p._id}
                               to={getPath(`/products/${p.slug}`)}
